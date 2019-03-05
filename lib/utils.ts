@@ -65,16 +65,12 @@ export function makeClickableAuthorsComponent(module: Module) {
 }
 
 export function makePackMcMeta(module: Module) {
-  return JSON.stringify(
-    {
-      pack: {
-        pack_format: 1,
-        description: makeHoverCardComponent(module)
-      }
-    },
-    null,
-    2
-  );
+  return JSON.stringify({
+    pack: {
+      pack_format: 1,
+      description: makeHoverCardComponent(module)
+    }
+  });
 }
 
 export function makeRegisterMcfunction(module: Module) {
