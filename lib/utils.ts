@@ -77,35 +77,54 @@ export function makeRegisterMcfunction(module: Module) {
   const registerComponents = {
     title: JSON.stringify(makeClickableTitleComponent(module)),
     authors: JSON.stringify(makeClickableAuthorsComponent(module)),
-    enable_hover: JSON.stringify({
+    color: JSON.stringify({
+      text: "",
+      color: module.color
+    }),
+    enable_button: JSON.stringify({
       text: "",
       hoverEvent: {
         action: "show_text",
         value: [
           { text: "Click to ", color: "green" },
-          { text: "Enable ", bold: true },
+          { text: "enable", bold: true },
+          " ",
           { text: module.title, color: module.color }
         ]
       }
     }),
-    disable_hover: JSON.stringify({
+    forget_button: JSON.stringify({
+      text: "",
+      hoverEvent: {
+        action: "show_text",
+        value: [
+          { text: "Click to ", color: "gray" },
+          { text: "forget", bold: true },
+          " ",
+          { text: module.title, color: module.color }
+        ]
+      }
+    }),
+    disable_button: JSON.stringify({
       text: "",
       hoverEvent: {
         action: "show_text",
         value: [
           { text: "Click to ", color: "red" },
-          { text: "Disable ", bold: true },
+          { text: "disable", bold: true },
+          " ",
           { text: module.title, color: module.color }
         ]
       }
     }),
-    remove_hover: JSON.stringify({
+    uninstall_button: JSON.stringify({
       text: "",
       hoverEvent: {
         action: "show_text",
         value: [
-          { text: "Click to ", color: "gold" },
-          { text: "Remove ", bold: true },
+          { text: "Click to ", color: "gray" },
+          { text: "uninstall", bold: true },
+          " ",
           { text: module.title, color: module.color }
         ]
       }
