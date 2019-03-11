@@ -149,8 +149,7 @@ export function makeRegisterMcfunction(module: Module) {
     title: module.title,
     color: module.color,
     description: module.description,
-    version: module.version_tuple,
-    label: module.version_label,
+    version: module.version,
     minecraft_version: module.minecraft_version,
     category: module.category,
     namespace: module.namespace,
@@ -158,6 +157,12 @@ export function makeRegisterMcfunction(module: Module) {
     url: module.url,
     authors: module.authors,
     dependencies: module.dependencies,
+    version_data: {
+      major: Number(module.version.split(".")[0]),
+      minor: Number(module.version.split(".")[1]),
+      patch: Number(module.version.split(".")[2].split("-")[0]),
+      label: module.version.split("-")[1]
+    },
     components: registerComponents,
     commands: registerCommands
   };

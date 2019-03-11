@@ -17,13 +17,6 @@ const module = JSON.parse(
   fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
 ) as Module;
 
-module.version_tuple = module.version
-  .split("-")[0]
-  .split(".")
-  .map(s => Number(s));
-
-module.version_label = module.version.split("-")[1];
-
 // pack.mcmeta
 const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
 console.log("Generating pack.mcmeta at:", packMcmetaPath);
