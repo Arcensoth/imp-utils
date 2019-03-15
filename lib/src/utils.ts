@@ -1,9 +1,4 @@
-import fs = require("fs");
-import path = require("path");
-
 import { DatapackModule } from "./datapack-module";
-
-const PROJECT_ROOT = path.resolve(path.join(__dirname, "..", ".."));
 
 export function makeHoverCardComponent(module: DatapackModule) {
   const components = [
@@ -78,7 +73,7 @@ export function makePackMcMeta(module: DatapackModule) {
   });
 }
 
-export function makeManageMcfunction(module: DatapackModule) {
+export function makeRegisterCommands(module: DatapackModule): string[] {
   const registrantNbtComponents = {
     title: JSON.stringify(makeClickableTitleComponent(module)),
     authors: JSON.stringify(makeClickableAuthorsComponent(module)),
@@ -156,26 +151,26 @@ export function makeManageMcfunction(module: DatapackModule) {
     components: registrantNbtComponents
   };
 
-  const managaMcfunctionTemplatePath = path.join(
-    PROJECT_ROOT,
-    "lib",
-    "src",
-    "manage.template.mcfunction"
-  );
+  return [
+    "execute if data entity @s Item.tag._imp.manage{register: true} run data modify entity @s Item.tag._imp.temp.registrants append value " +
+      JSON.stringify(registrantNbt)
+  ];
+}
 
-  console.log(
-    "Reading manage.mcfunction template from:",
-    managaMcfunctionTemplatePath
-  );
+export function makeInstallCommands(module: DatapackModule): string[] {
+  return [
+    `execute if data entity @s` +
+      ` Item.tag._imp.manage{install: ['${module.namespace}']}` +
+      ` run function ${module.namespace}:.module/setup`
+  ];
+}
 
-  const managaMcfunctionTemplate = fs.readFileSync(
-    managaMcfunctionTemplatePath,
-    "utf8"
-  );
-
-  return managaMcfunctionTemplate
-    .replace(/%%registrant_nbt%%/g, JSON.stringify(registrantNbt))
-    .replace(/%%module_namespace%%/g, module.namespace);
+export function makeManageMcfunction(module: DatapackModule) {
+  return [
+    ...makeRegisterCommands(module),
+    ...makeInstallCommands(module),
+    ""
+  ].join("\n");
 }
 
 export function makeManageTagJson(module: DatapackModule) {
