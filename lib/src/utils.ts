@@ -131,20 +131,6 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     })
   };
 
-  const registerNbtCommands = {
-    setup: `execute as d-e-a-d-beef at @s run function ${
-      module.namespace
-    }:.module/setup`,
-
-    teardown: `execute as d-e-a-d-beef at @s run function ${
-      module.namespace
-    }:.module/teardown`,
-
-    enable: `datapack enable "file/${module.namespace}"`,
-
-    disable: `datapack disable "file/${module.namespace}"`
-  };
-
   const registrantNbt = {
     title: module.title,
     color: module.color,
@@ -163,8 +149,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       patch: Number(module.version.split(".")[2].split("-")[0]),
       label: module.version.split("-")[1]
     },
-    components: registrantNbtComponents,
-    commands: registerNbtCommands
+    components: registrantNbtComponents
   };
 
   return [
