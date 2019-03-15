@@ -1,8 +1,8 @@
 import fs = require("fs");
 import path = require("path");
 
-import { Module } from "./module";
-import { makePackMcMeta, makeRegisterMcfunction } from "./utils";
+import { DatapackModule } from "./datapack-module";
+import { makePackMcMeta, makeManageMcfunction } from "./utils";
 
 if (process.argv.length < 3) {
   console.error("You must provide a datapack root");
@@ -13,25 +13,25 @@ const datapackPath = path.resolve(process.argv[2]);
 
 console.log("Using datapack root:", datapackPath);
 
-const module = JSON.parse(
+const moduleConfig = JSON.parse(
   fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
-) as Module;
+) as DatapackModule;
 
 // pack.mcmeta
 const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
 console.log("Generating pack.mcmeta at:", packMcmetaPath);
-const packMcmeta = makePackMcMeta(module);
+const packMcmeta = makePackMcMeta(moduleConfig);
 fs.writeFileSync(packMcmetaPath, packMcmeta);
 
-// register.mcfunction
-const registerMcfunctionPath = path.join(
+// manage.mcfunction
+const manageMcfunctionPath = path.join(
   datapackPath,
   "data",
-  module.namespace,
+  moduleConfig.namespace,
   "functions",
   ".module",
-  "register.mcfunction"
+  "manage.mcfunction"
 );
-console.log("Generating register.mcfunction at:", registerMcfunctionPath);
-const registerMcfunction = makeRegisterMcfunction(module);
-fs.writeFileSync(registerMcfunctionPath, registerMcfunction);
+console.log("Generating manage.mcfunction at:", manageMcfunctionPath);
+const manageMcfunction = makeManageMcfunction(moduleConfig);
+fs.writeFileSync(manageMcfunctionPath, manageMcfunction);

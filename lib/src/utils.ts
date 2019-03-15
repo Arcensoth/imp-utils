@@ -1,6 +1,6 @@
-import { Module } from "./module";
+import { DatapackModule } from "./datapack-module";
 
-export function makeHoverCardComponent(module: Module) {
+export function makeHoverCardComponent(module: DatapackModule) {
   const components = [
     { text: "", color: "gray" },
     { text: module.title, color: module.color },
@@ -25,7 +25,7 @@ export function makeHoverCardComponent(module: Module) {
   return components;
 }
 
-export function makeClickableTitleComponent(module: Module) {
+export function makeClickableTitleComponent(module: DatapackModule) {
   return {
     text: module.title,
     hoverEvent: {
@@ -39,7 +39,7 @@ export function makeClickableTitleComponent(module: Module) {
   };
 }
 
-export function makeClickableAuthorsComponent(module: Module) {
+export function makeClickableAuthorsComponent(module: DatapackModule) {
   const components: any[] = [{ text: "", color: "gray" }];
 
   module.authors.forEach(author => {
@@ -64,7 +64,7 @@ export function makeClickableAuthorsComponent(module: Module) {
   return components;
 }
 
-export function makePackMcMeta(module: Module) {
+export function makePackMcMeta(module: DatapackModule) {
   return JSON.stringify({
     pack: {
       pack_format: 1,
@@ -73,8 +73,8 @@ export function makePackMcMeta(module: Module) {
   });
 }
 
-export function makeRegisterMcfunction(module: Module) {
-  const registerComponents = {
+export function makeRegisterCommands(module: DatapackModule): string[] {
+  const registrantNbtComponents = {
     title: JSON.stringify(makeClickableTitleComponent(module)),
     authors: JSON.stringify(makeClickableAuthorsComponent(module)),
     color: JSON.stringify({
@@ -131,7 +131,7 @@ export function makeRegisterMcfunction(module: Module) {
     })
   };
 
-  const registerCommands = {
+  const registerNbtCommands = {
     setup: `execute as d-e-a-d-beef at @s run function ${
       module.namespace
     }:.module/setup`,
@@ -145,7 +145,7 @@ export function makeRegisterMcfunction(module: Module) {
     disable: `datapack disable "file/${module.namespace}"`
   };
 
-  const registerMcfunctionNbt = {
+  const registrantNbt = {
     title: module.title,
     color: module.color,
     description: module.description,
@@ -163,15 +163,16 @@ export function makeRegisterMcfunction(module: Module) {
       patch: Number(module.version.split(".")[2].split("-")[0]),
       label: module.version.split("-")[1]
     },
-    components: registerComponents,
-    commands: registerCommands
+    components: registrantNbtComponents,
+    commands: registerNbtCommands
   };
 
-  const registerMcfunctionCommands = [
-    "data modify entity @s Item.tag._imp.args.register set value " +
-      JSON.stringify(registerMcfunctionNbt),
-    "function imp:api/register"
+  return [
+    "execute if data entity @s Item.tag._imp.manage{register: true} run data modify entity @s Item.tag._imp.temp.registrants append value " +
+      JSON.stringify(registrantNbt)
   ];
+}
 
-  return registerMcfunctionCommands.join("\n");
+export function makeManageMcfunction(module: DatapackModule) {
+  return [...makeRegisterCommands(module)].join("\n");
 }

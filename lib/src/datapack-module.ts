@@ -1,14 +1,14 @@
-export interface ModuleDependency {
+export interface DatapackModuleDependency {
   namespace: string;
   version: string;
 }
 
-export interface ModuleAuthor {
+export interface DatapackModuleAuthor {
   name: string;
   url: string;
 }
 
-export interface Module {
+export interface DatapackModule {
   title: string;
   color: string;
   description: string;
@@ -18,6 +18,6 @@ export interface Module {
   namespace: string;
   scorespace: string;
   url: string;
-  authors: ModuleAuthor[];
-  dependencies: ModuleDependency[];
+  authors: DatapackModuleAuthor[];
+  dependencies: DatapackModuleDependency[];
 }
