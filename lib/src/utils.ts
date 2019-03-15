@@ -174,7 +174,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 }
 
 export function makeManageMcfunction(module: DatapackModule) {
-  return [...makeRegisterCommands(module)].join("\n");
+  return [...makeRegisterCommands(module), ""].join("\n");
 }
 
 export function makeManageTagJson(module: DatapackModule) {
