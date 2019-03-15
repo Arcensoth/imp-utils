@@ -173,8 +173,20 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
   ];
 }
 
+export function makeInstallCommands(module: DatapackModule): string[] {
+  return [
+    `execute if data entity @s` +
+      ` Item.tag._imp.manage{install: ['${module.namespace}']}` +
+      ` run function ${module.namespace}:.module/setup`
+  ];
+}
+
 export function makeManageMcfunction(module: DatapackModule) {
-  return [...makeRegisterCommands(module), ""].join("\n");
+  return [
+    ...makeRegisterCommands(module),
+    ...makeInstallCommands(module),
+    ""
+  ].join("\n");
 }
 
 export function makeManageTagJson(module: DatapackModule) {
