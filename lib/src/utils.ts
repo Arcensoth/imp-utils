@@ -143,12 +143,11 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     url: module.url,
     authors: module.authors,
     dependencies: module.dependencies,
-    version_data: {
-      major: Number(module.version.split(".")[0]),
-      minor: Number(module.version.split(".")[1]),
-      patch: Number(module.version.split(".")[2].split("-")[0]),
-      label: module.version.split("-")[1]
-    },
+    // extras
+    version_major: Number(module.version.split(".")[0]),
+    version_minor: Number(module.version.split(".")[1]),
+    version_patch: Number(module.version.split(".")[2].split("-")[0]),
+    version_label: module.version.split("-")[1],
     components: registrantNbtComponents
   };
 
