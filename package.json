@@ -6,7 +6,8 @@
   "repository": "https://github.com/Arcensoth/imp-utils",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b lib -v && node lib/cli.js"
+    "compile-lib": "tsc -b lib -v",
+    "cli": "npm run compile-lib && node lib/out/cli.js"
   },
   "devDependencies": {
     "typescript": "latest",

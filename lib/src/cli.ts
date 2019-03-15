@@ -1,7 +1,7 @@
 import fs = require("fs");
 import path = require("path");
 
-import { Module } from "./module-config";
+import { Module } from "./module";
 import { makePackMcMeta, makeRegisterMcfunction } from "./utils";
 
 if (process.argv.length < 3) {

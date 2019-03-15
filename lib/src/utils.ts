@@ -1,4 +1,4 @@
-import { Module } from "./module-config";
+import { Module } from "./module";
 
 export function makeHoverCardComponent(module: Module) {
   const components = [
