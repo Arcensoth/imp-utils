@@ -2,7 +2,11 @@ import fs = require("fs");
 import path = require("path");
 
 import { DatapackModule } from "./datapack-module";
-import { makePackMcMeta, makeManageMcfunction } from "./utils";
+import {
+  makePackMcMeta,
+  makeManageMcfunction,
+  makeManageTagJson
+} from "./utils";
 
 if (process.argv.length < 3) {
   console.error("You must provide a datapack root");
@@ -35,3 +39,16 @@ const manageMcfunctionPath = path.join(
 console.log("Generating manage.mcfunction at:", manageMcfunctionPath);
 const manageMcfunction = makeManageMcfunction(moduleConfig);
 fs.writeFileSync(manageMcfunctionPath, manageMcfunction);
+
+// manage.json (function tag)
+const manageTagJsonPath = path.join(
+  datapackPath,
+  "data",
+  "imp",
+  "tags",
+  "functions",
+  "manage.json"
+);
+console.log("Generating manage.mcfunction at:", manageTagJsonPath);
+const manageTagJson = makeManageTagJson(moduleConfig);
+fs.writeFileSync(manageTagJsonPath, manageTagJson);

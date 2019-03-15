@@ -176,3 +176,9 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 export function makeManageMcfunction(module: DatapackModule) {
   return [...makeRegisterCommands(module)].join("\n");
 }
+
+export function makeManageTagJson(module: DatapackModule) {
+  return JSON.stringify({
+    values: [`${module.namespace}:.module/manage`]
+  });
+}
