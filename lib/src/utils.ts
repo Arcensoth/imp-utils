@@ -91,6 +91,10 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
           " ",
           { text: module.title, color: module.color }
         ]
+      },
+      clickEvent: {
+        action: "run_command",
+        value: `/datapack enable "file/${module.namespace}"`
       }
     }),
     forget_button: JSON.stringify({
@@ -115,6 +119,10 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
           " ",
           { text: module.title, color: module.color }
         ]
+      },
+      clickEvent: {
+        action: "run_command",
+        value: `/datapack disable "file/${module.namespace}"`
       }
     }),
     uninstall_button: JSON.stringify({
