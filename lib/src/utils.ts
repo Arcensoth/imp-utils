@@ -73,6 +73,40 @@ export function makePackMcMeta(module: DatapackModule) {
   });
 }
 
+export function makeForgetDispatchCommands(module: DatapackModule): string[] {
+  // TODO move menu forget commands to the core api
+  return [
+    "execute as d-e-a-d-beef at @s run " +
+      `data remove entity d-e-a-d-beef ` +
+      `Item.tag._imp.registry[{id: ${module.namespace}}]`
+    // "execute as d-e-a-d-beef at @s run function imp:core/print_menu"
+  ];
+}
+
+export function makeForgetDispatchCommandsString(
+  module: DatapackModule
+): string {
+  return "['" + makeForgetDispatchCommands(module).join("', '") + "']";
+}
+
+export function makeUninstallDispatchCommands(
+  module: DatapackModule
+): string[] {
+  // TODO move menu uninstall commands to the core api
+  return [
+    "execute as d-e-a-d-beef at @s run " +
+      `function ${module.namespace}:.module/teardown`,
+    "execute as d-e-a-d-beef at @s run " +
+      `datapack disable "file/${module.namespace}"`
+  ];
+}
+
+export function makeUninstallDispatchCommandsString(
+  module: DatapackModule
+): string {
+  return "['" + makeUninstallDispatchCommands(module).join("', '") + "']";
+}
+
 export function makeRegisterCommands(module: DatapackModule): string[] {
   const registrantNbtComponents = {
     title: JSON.stringify(makeClickableTitleComponent(module)),
@@ -107,6 +141,14 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
           " ",
           { text: module.title, color: module.color }
         ]
+      },
+      clickEvent: {
+        action: "run_command",
+        value:
+          "/give @s minecraft:command_block" +
+          "{_imp:{trigger: {type: dispatch_commands, commands: " +
+          makeForgetDispatchCommandsString(module) +
+          "}}}"
       }
     }),
     disable_button: JSON.stringify({
@@ -135,6 +177,14 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
           " ",
           { text: module.title, color: module.color }
         ]
+      },
+      clickEvent: {
+        action: "run_command",
+        value:
+          "/give @s minecraft:command_block" +
+          "{_imp:{trigger: {type: dispatch_commands, commands: " +
+          makeUninstallDispatchCommandsString(module) +
+          "}}}"
       }
     })
   };
