@@ -74,11 +74,14 @@ export function makePackMcMeta(module: DatapackModule) {
 }
 
 export function makeForgetDispatchCommands(module: DatapackModule): string[] {
-  // TODO move menu forget commands to the core api
   return [
-    "execute as d-e-a-d-beef at @s run " +
-      `data remove entity d-e-a-d-beef ` +
-      `Item.tag._imp.registry[{id: ${module.namespace}}]`
+    "data modify entity d-e-a-d-beef Item.tag._imp.args.manage.forget " +
+      `set value ${module.namespace}`,
+    "function imp:manage/forget"
+    // TODO in datapack: iterate over registry, find and delete match, print menu
+    // "execute as d-e-a-d-beef at @s run " +
+    //   `data remove entity d-e-a-d-beef ` +
+    //   `Item.tag._imp.registry[{id: ${module.namespace}}]`
     // "execute as d-e-a-d-beef at @s run function imp:core/print_menu"
   ];
 }
@@ -92,12 +95,11 @@ export function makeForgetDispatchCommandsString(
 export function makeUninstallDispatchCommands(
   module: DatapackModule
 ): string[] {
-  // TODO move menu uninstall commands to the core api
+  // TODO in datapack: set manage flags, call manage hook
   return [
-    "execute as d-e-a-d-beef at @s run " +
-      `function ${module.namespace}:.module/teardown`,
-    "execute as d-e-a-d-beef at @s run " +
-      `datapack disable "file/${module.namespace}"`
+    "data modify entity d-e-a-d-beef Item.tag._imp.args.manage.uninstall " +
+      `set value ${module.namespace}`,
+    "function imp:manage/uninstall"
   ];
 }
 
@@ -108,6 +110,42 @@ export function makeUninstallDispatchCommandsString(
 }
 
 export function makeRegisterCommands(module: DatapackModule): string[] {
+  const forgetButtonCommand =
+    "/give @s minecraft:command_block" +
+    "{_imp:{trigger: {type: dispatch_commands, commands: " +
+    makeForgetDispatchCommandsString(module) +
+    "}}}";
+
+  console.log(`Length of forget button command: ${forgetButtonCommand.length}`);
+
+  if (forgetButtonCommand.length > 255) {
+    console.error(
+      new Error(
+        "Forget button command exceeds chat command limit: " +
+          forgetButtonCommand
+      )
+    );
+  }
+
+  const uninstallButtonCommand =
+    "/give @s minecraft:command_block" +
+    "{_imp:{trigger: {type: dispatch_commands, commands: " +
+    makeUninstallDispatchCommandsString(module) +
+    "}}}";
+
+  console.log(
+    `Length of uninstall button command: ${uninstallButtonCommand.length}`
+  );
+
+  if (uninstallButtonCommand.length > 255) {
+    console.error(
+      new Error(
+        "Uninstall button command exceeds chat command limit " +
+          uninstallButtonCommand
+      )
+    );
+  }
+
   const registrantNbtComponents = {
     title: JSON.stringify(makeClickableTitleComponent(module)),
     authors: JSON.stringify(makeClickableAuthorsComponent(module)),
@@ -144,11 +182,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       },
       clickEvent: {
         action: "run_command",
-        value:
-          "/give @s minecraft:command_block" +
-          "{_imp:{trigger: {type: dispatch_commands, commands: " +
-          makeForgetDispatchCommandsString(module) +
-          "}}}"
+        value: forgetButtonCommand
       }
     }),
     disable_button: JSON.stringify({
@@ -180,11 +214,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       },
       clickEvent: {
         action: "run_command",
-        value:
-          "/give @s minecraft:command_block" +
-          "{_imp:{trigger: {type: dispatch_commands, commands: " +
-          makeUninstallDispatchCommandsString(module) +
-          "}}}"
+        value: uninstallButtonCommand
       }
     })
   };
@@ -223,10 +253,20 @@ export function makeInstallCommands(module: DatapackModule): string[] {
   ];
 }
 
+export function makeUninstallCommands(module: DatapackModule): string[] {
+  return [
+    `execute if data entity @s` +
+      ` Item.tag._imp.manage{uninstall: ['${module.namespace}']}` +
+      ` run function ${module.namespace}:.module/teardown`,
+    `datapack disable "file/${module.namespace}"`
+  ];
+}
+
 export function makeManageMcfunction(module: DatapackModule) {
   return [
     ...makeRegisterCommands(module),
     ...makeInstallCommands(module),
+    ...makeUninstallCommands(module),
     ""
   ].join("\n");
 }
