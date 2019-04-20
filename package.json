@@ -10,7 +10,7 @@
     "cli": "npm run compile-lib && node lib/out/cli.js"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "@types/node": "latest"
+    "@types/node": "latest",
+    "typescript": "^3.4.4"
   }
 }

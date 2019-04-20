@@ -174,7 +174,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       hoverEvent: {
         action: "show_text",
         value: [
-          { text: "Click to ", color: "gray" },
+          { text: "Click to ", color: "red" },
           { text: "forget", bold: true },
           " ",
           { text: module.title, color: module.color }
@@ -206,7 +206,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       hoverEvent: {
         action: "show_text",
         value: [
-          { text: "Click to ", color: "gray" },
+          { text: "Click to ", color: "red" },
           { text: "uninstall", bold: true },
           " ",
           { text: module.title, color: module.color }
@@ -254,11 +254,13 @@ export function makeInstallCommands(module: DatapackModule): string[] {
 }
 
 export function makeUninstallCommands(module: DatapackModule): string[] {
+  const execute =
+    `execute if data entity @s ` +
+    `Item.tag._imp.manage{uninstall: ['${module.namespace}']} run`;
+
   return [
-    `execute if data entity @s` +
-      ` Item.tag._imp.manage{uninstall: ['${module.namespace}']}` +
-      ` run function ${module.namespace}:.module/teardown`,
-    `datapack disable "file/${module.namespace}"`
+    `${execute} function ${module.namespace}:.module/teardown`,
+    `${execute} datapack disable "file/${module.namespace}"`
   ];
 }
 
