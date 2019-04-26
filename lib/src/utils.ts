@@ -75,13 +75,13 @@ export function makePackMcMeta(module: DatapackModule) {
 
 export function makeForgetDispatchCommands(module: DatapackModule): string[] {
   return [
-    "data modify entity d-e-a-d-beef Item.tag._imp.args.manage.forget " +
+    "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.forget " +
       `set value ${module.namespace}`,
     "function imp:manage/forget"
     // TODO in datapack: iterate over registry, find and delete match, print menu
     // "execute as d-e-a-d-beef at @s run " +
     //   `data remove entity d-e-a-d-beef ` +
-    //   `Item.tag._imp.registry[{id: ${module.namespace}}]`
+    //   `Item.tag.imp.registry[{id: ${module.namespace}}]`
     // "execute as d-e-a-d-beef at @s run function imp:core/print_menu"
   ];
 }
@@ -97,7 +97,7 @@ export function makeUninstallDispatchCommands(
 ): string[] {
   // TODO in datapack: set manage flags, call manage hook
   return [
-    "data modify entity d-e-a-d-beef Item.tag._imp.args.manage.uninstall " +
+    "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.uninstall " +
       `set value ${module.namespace}`,
     "function imp:manage/uninstall"
   ];
@@ -112,7 +112,7 @@ export function makeUninstallDispatchCommandsString(
 export function makeRegisterCommands(module: DatapackModule): string[] {
   const forgetButtonCommand =
     "/give @s minecraft:command_block" +
-    "{_imp:{trigger: {type: dispatch_commands, commands: " +
+    "{imp:{trigger: {type: dispatch_commands, commands: " +
     makeForgetDispatchCommandsString(module) +
     "}}}";
 
@@ -129,7 +129,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 
   const uninstallButtonCommand =
     "/give @s minecraft:command_block" +
-    "{_imp:{trigger: {type: dispatch_commands, commands: " +
+    "{imp:{trigger: {type: dispatch_commands, commands: " +
     makeUninstallDispatchCommandsString(module) +
     "}}}";
 
@@ -240,7 +240,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
   };
 
   return [
-    "execute if data entity @s Item.tag._imp.manage{register: true} run data modify entity @s Item.tag._imp.temp.registrants append value " +
+    "execute if data entity @s Item.tag.__args__.imp.manage{register: true} run data modify entity @s Item.tag.__args__.imp.registrants append value " +
       JSON.stringify(registrantNbt)
   ];
 }
@@ -248,7 +248,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 export function makeInstallCommands(module: DatapackModule): string[] {
   return [
     `execute if data entity @s` +
-      ` Item.tag._imp.manage{install: ['${module.namespace}']}` +
+      ` Item.tag.__args__.imp.manage{install: ['${module.namespace}']}` +
       ` run function ${module.namespace}:.module/setup`
   ];
 }
@@ -256,7 +256,7 @@ export function makeInstallCommands(module: DatapackModule): string[] {
 export function makeUninstallCommands(module: DatapackModule): string[] {
   const execute =
     `execute if data entity @s ` +
-    `Item.tag._imp.manage{uninstall: ['${module.namespace}']} run`;
+    `Item.tag.__args__.imp.manage{uninstall: ['${module.namespace}']} run`;
 
   return [
     `${execute} function ${module.namespace}:.module/teardown`,
