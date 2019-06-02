@@ -73,17 +73,54 @@ export function makePackMcMeta(module: DatapackModule) {
   });
 }
 
+export function makeEnableDispatchCommands(module: DatapackModule): string[] {
+  // FIXME implement in datapack
+  // datapack enable "file/${module.namespace}"
+  return [
+    "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.enable " +
+      `set value ${module.namespace}`,
+    "function imp:manage/enable"
+  ];
+}
+
 export function makeForgetDispatchCommands(module: DatapackModule): string[] {
+  // FIXME implement in datapack: iterate over registry, find and delete match, print menu
+  // "execute as d-e-a-d-beef at @s run " +
+  //   `data remove entity d-e-a-d-beef ` +
+  //   `Item.tag.imp.registry[{id: ${module.namespace}}]`
+  // "execute as d-e-a-d-beef at @s run function imp:core/print_menu"
   return [
     "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.forget " +
       `set value ${module.namespace}`,
     "function imp:manage/forget"
-    // TODO in datapack: iterate over registry, find and delete match, print menu
-    // "execute as d-e-a-d-beef at @s run " +
-    //   `data remove entity d-e-a-d-beef ` +
-    //   `Item.tag.imp.registry[{id: ${module.namespace}}]`
-    // "execute as d-e-a-d-beef at @s run function imp:core/print_menu"
   ];
+}
+
+export function makeDisableDispatchCommands(module: DatapackModule): string[] {
+  // FIXME implement in datapack
+  // datapack disable "file/${module.namespace}"
+  return [
+    "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.disable " +
+      `set value ${module.namespace}`,
+    "function imp:manage/disable"
+  ];
+}
+
+export function makeUninstallDispatchCommands(
+  module: DatapackModule
+): string[] {
+  // FIXME implement in datapack: set manage flags, call manage hook
+  return [
+    "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.uninstall " +
+      `set value ${module.namespace}`,
+    "function imp:manage/uninstall"
+  ];
+}
+
+export function makeEnableDispatchCommandsString(
+  module: DatapackModule
+): string {
+  return "['" + makeEnableDispatchCommands(module).join("', '") + "']";
 }
 
 export function makeForgetDispatchCommandsString(
@@ -92,15 +129,10 @@ export function makeForgetDispatchCommandsString(
   return "['" + makeForgetDispatchCommands(module).join("', '") + "']";
 }
 
-export function makeUninstallDispatchCommands(
+export function makeDisableDispatchCommandsString(
   module: DatapackModule
-): string[] {
-  // TODO in datapack: set manage flags, call manage hook
-  return [
-    "data modify entity d-e-a-d-beef Item.tag.__args__.imp.manage.uninstall " +
-      `set value ${module.namespace}`,
-    "function imp:manage/uninstall"
-  ];
+): string {
+  return "['" + makeDisableDispatchCommands(module).join("', '") + "']";
 }
 
 export function makeUninstallDispatchCommandsString(
@@ -110,6 +142,27 @@ export function makeUninstallDispatchCommandsString(
 }
 
 export function makeRegisterCommands(module: DatapackModule): string[] {
+  // ENABLE BUTTON -------------------------------------------------------------
+
+  const enableButtonCommand =
+    "/give @s minecraft:command_block" +
+    "{imp:{trigger: {type: dispatch_commands, commands: " +
+    makeEnableDispatchCommandsString(module) +
+    "}}}";
+
+  console.log(`Length of enable button command: ${enableButtonCommand.length}`);
+
+  if (enableButtonCommand.length > 255) {
+    console.error(
+      new Error(
+        "Enable button command exceeds chat command limit: " +
+          enableButtonCommand
+      )
+    );
+  }
+
+  // FORGET BUTTON -------------------------------------------------------------
+
   const forgetButtonCommand =
     "/give @s minecraft:command_block" +
     "{imp:{trigger: {type: dispatch_commands, commands: " +
@@ -126,6 +179,29 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       )
     );
   }
+
+  // DISABLE BUTTON ------------------------------------------------------------
+
+  const disableButtonCommand =
+    "/give @s minecraft:command_block" +
+    "{imp:{trigger: {type: dispatch_commands, commands: " +
+    makeDisableDispatchCommandsString(module) +
+    "}}}";
+
+  console.log(
+    `Length of disable button command: ${disableButtonCommand.length}`
+  );
+
+  if (disableButtonCommand.length > 255) {
+    console.error(
+      new Error(
+        "Disable button command exceeds chat command limit: " +
+          disableButtonCommand
+      )
+    );
+  }
+
+  // UNINSTALL BUTTON ----------------------------------------------------------
 
   const uninstallButtonCommand =
     "/give @s minecraft:command_block" +
@@ -145,6 +221,8 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       )
     );
   }
+
+  // ---------------------------------------------------------------------------
 
   const registrantNbtComponents = {
     title: JSON.stringify(makeClickableTitleComponent(module)),
@@ -166,7 +244,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       },
       clickEvent: {
         action: "run_command",
-        value: `/datapack enable "file/${module.namespace}"`
+        value: enableButtonCommand
       }
     }),
     forget_button: JSON.stringify({
@@ -198,7 +276,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       },
       clickEvent: {
         action: "run_command",
-        value: `/datapack disable "file/${module.namespace}"`
+        value: disableButtonCommand
       }
     }),
     uninstall_button: JSON.stringify({
