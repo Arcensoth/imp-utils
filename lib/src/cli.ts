@@ -36,7 +36,7 @@ const manageMcfunctionPath = path.join(
   ".module",
   "manage.mcfunction"
 );
-console.log("Generating manage.mcfunction at:", manageMcfunctionPath);
+console.log("Generating manage function at:", manageMcfunctionPath);
 const manageMcfunction = makeManageMcfunction(moduleConfig);
 fs.writeFileSync(manageMcfunctionPath, manageMcfunction);
 
@@ -49,6 +49,6 @@ const manageTagJsonPath = path.join(
   "functions",
   "manage.json"
 );
-console.log("Generating manage.mcfunction at:", manageTagJsonPath);
+console.log("Generating manage tag at:", manageTagJsonPath);
 const manageTagJson = makeManageTagJson(moduleConfig);
 fs.writeFileSync(manageTagJsonPath, manageTagJson);
