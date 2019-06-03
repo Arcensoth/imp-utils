@@ -69,7 +69,7 @@ export function makeClickableAuthorsComponent(module: DatapackModule) {
 export function makePackMcMeta(module: DatapackModule) {
   return JSON.stringify({
     pack: {
-      pack_format: 1,
+      pack_format: 4,
       description: makeHoverCardComponent(module)
     }
   });
