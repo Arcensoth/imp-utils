@@ -170,6 +170,9 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       ),
       uninstall_button: JSON.stringify(
         makeManageButtonComponent(module, "uninstall", "red")
+      ),
+      reinstall_button: JSON.stringify(
+        makeManageButtonComponent(module, "reinstall", "yellow")
       )
     },
 
