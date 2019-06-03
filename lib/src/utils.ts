@@ -66,246 +66,69 @@ export function makeClickableAuthorsComponent(module: DatapackModule) {
   return components;
 }
 
-export function makePackMcMeta(module: DatapackModule) {
-  return JSON.stringify({
-    pack: {
-      pack_format: 4,
-      description: makeHoverCardComponent(module)
-    }
-  });
-}
-
-export function makeEnableDispatchCommands(module: DatapackModule): string[] {
-  return [
-    "execute as d-e-a-d-beef run data modify entity @s Item.tag.__args__.imp.manage.entry " +
-      `set from entity @s Item.tag.imp.registry[{id:${module.namespace}}]`,
-    "function imp:manage/enable"
-  ];
-}
-
-export function makeForgetDispatchCommands(module: DatapackModule): string[] {
-  return [
-    "execute as d-e-a-d-beef run data modify entity @s Item.tag.__args__.imp.manage.entry " +
-      `set from entity @s Item.tag.imp.registry[{id:${module.namespace}}]`,
-    "function imp:manage/forget"
-  ];
-}
-
-export function makeDisableDispatchCommands(module: DatapackModule): string[] {
-  return [
-    "execute as d-e-a-d-beef run data modify entity @s Item.tag.__args__.imp.manage.entry " +
-      `set from entity @s Item.tag.imp.registry[{id:${module.namespace}}]`,
-    "function imp:manage/disable"
-  ];
-}
-
-export function makeUninstallDispatchCommands(
-  module: DatapackModule
+export function makeManageDispatchCommands(
+  module: DatapackModule,
+  route: string
 ): string[] {
   return [
     "execute as d-e-a-d-beef run data modify entity @s Item.tag.__args__.imp.manage.entry " +
       `set from entity @s Item.tag.imp.registry[{id:${module.namespace}}]`,
-    "function imp:manage/uninstall"
+    `function imp:manage/${route}`
   ];
 }
 
-export function makeEnableDispatchCommandsString(
-  module: DatapackModule
+export function makeManageDispatchCommandsString(
+  module: DatapackModule,
+  route: string
 ): string {
-  return "['" + makeEnableDispatchCommands(module).join("','") + "']";
+  return "['" + makeManageDispatchCommands(module, route).join("','") + "']";
 }
 
-export function makeForgetDispatchCommandsString(
-  module: DatapackModule
+export function makeManageButtonCommand(
+  module: DatapackModule,
+  route: string
 ): string {
-  return "['" + makeForgetDispatchCommands(module).join("','") + "']";
+  const buttonCommand =
+    `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:` +
+    makeManageDispatchCommandsString(module, route) +
+    "}}";
+
+  console.log(`Length of command for ${route} button: ${buttonCommand.length}`);
+  console.log(`    ${buttonCommand}`);
+
+  if (buttonCommand.length > 255) {
+    console.error(
+      new Error(`Command for ${route} button exceeds chat command limit`)
+    );
+  }
+
+  return buttonCommand;
 }
 
-export function makeDisableDispatchCommandsString(
-  module: DatapackModule
-): string {
-  return "['" + makeDisableDispatchCommands(module).join("','") + "']";
-}
-
-export function makeUninstallDispatchCommandsString(
-  module: DatapackModule
-): string {
-  return "['" + makeUninstallDispatchCommands(module).join("','") + "']";
+export function makeManageButtonComponent(
+  module: DatapackModule,
+  route: string,
+  color: string
+): any {
+  return {
+    text: "",
+    hoverEvent: {
+      action: "show_text",
+      value: [
+        { text: "Click to ", color: color },
+        { text: route, bold: true },
+        " ",
+        { text: module.title, color: module.color }
+      ]
+    },
+    clickEvent: {
+      action: "run_command",
+      value: makeManageButtonCommand(module, route)
+    }
+  };
 }
 
 export function makeRegisterCommands(module: DatapackModule): string[] {
-  // ENABLE BUTTON -------------------------------------------------------------
-
-  const enableButtonCommand =
-    `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:` +
-    makeEnableDispatchCommandsString(module) +
-    "}}";
-
-  console.log(`Length of enable button command: ${enableButtonCommand.length}`);
-  console.log(`    ${enableButtonCommand}`);
-
-  if (enableButtonCommand.length > 255) {
-    console.error(
-      new Error(
-        "Enable button command exceeds chat command limit: " +
-          enableButtonCommand
-      )
-    );
-  }
-
-  // FORGET BUTTON -------------------------------------------------------------
-
-  const forgetButtonCommand =
-    `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:` +
-    makeForgetDispatchCommandsString(module) +
-    "}}";
-
-  console.log(`Length of forget button command: ${forgetButtonCommand.length}`);
-  console.log(`    ${forgetButtonCommand}`);
-
-  if (forgetButtonCommand.length > 255) {
-    console.error(
-      new Error(
-        "Forget button command exceeds chat command limit: " +
-          forgetButtonCommand
-      )
-    );
-  }
-
-  // DISABLE BUTTON ------------------------------------------------------------
-
-  const disableButtonCommand =
-    `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:` +
-    makeDisableDispatchCommandsString(module) +
-    "}}";
-
-  console.log(
-    `Length of disable button command: ${disableButtonCommand.length}`
-  );
-  console.log(`    ${disableButtonCommand}`);
-
-  if (disableButtonCommand.length > 255) {
-    console.error(
-      new Error(
-        "Disable button command exceeds chat command limit: " +
-          disableButtonCommand
-      )
-    );
-  }
-
-  // UNINSTALL BUTTON ----------------------------------------------------------
-
-  const uninstallButtonCommand =
-    `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:` +
-    makeUninstallDispatchCommandsString(module) +
-    "}}";
-
-  console.log(
-    `Length of uninstall button command: ${uninstallButtonCommand.length}`
-  );
-  console.log(`    ${uninstallButtonCommand}`);
-
-  if (uninstallButtonCommand.length > 255) {
-    console.error(
-      new Error(
-        "Uninstall button command exceeds chat command limit " +
-          uninstallButtonCommand
-      )
-    );
-  }
-
-  // TEXT COMPONENTS -----------------------------------------------------------
-
-  const registrantNbtTextComponents = {
-    title: JSON.stringify(makeClickableTitleComponent(module)),
-    authors: JSON.stringify(makeClickableAuthorsComponent(module)),
-    color: JSON.stringify({
-      text: "",
-      color: module.color
-    }),
-    enable_button: JSON.stringify({
-      text: "",
-      hoverEvent: {
-        action: "show_text",
-        value: [
-          { text: "Click to ", color: "green" },
-          { text: "enable", bold: true },
-          " ",
-          { text: module.title, color: module.color }
-        ]
-      },
-      clickEvent: {
-        action: "run_command",
-        value: enableButtonCommand
-      }
-    }),
-    forget_button: JSON.stringify({
-      text: "",
-      hoverEvent: {
-        action: "show_text",
-        value: [
-          { text: "Click to ", color: "red" },
-          { text: "forget", bold: true },
-          " ",
-          { text: module.title, color: module.color }
-        ]
-      },
-      clickEvent: {
-        action: "run_command",
-        value: forgetButtonCommand
-      }
-    }),
-    disable_button: JSON.stringify({
-      text: "",
-      hoverEvent: {
-        action: "show_text",
-        value: [
-          { text: "Click to ", color: "red" },
-          { text: "disable", bold: true },
-          " ",
-          { text: module.title, color: module.color }
-        ]
-      },
-      clickEvent: {
-        action: "run_command",
-        value: disableButtonCommand
-      }
-    }),
-    uninstall_button: JSON.stringify({
-      text: "",
-      hoverEvent: {
-        action: "show_text",
-        value: [
-          { text: "Click to ", color: "red" },
-          { text: "uninstall", bold: true },
-          " ",
-          { text: module.title, color: module.color }
-        ]
-      },
-      clickEvent: {
-        action: "run_command",
-        value: uninstallButtonCommand
-      }
-    })
-  };
-
-  // ---------------------------------------------------------------------------
-
-  const registrantNbtDispatchCommands = {
-    setup: `function ${module.namespace}:${module.setup_function}`,
-    teardown: `function ${module.namespace}:${module.teardown_function}`,
-    enable: `datapack enable "file/${module.namespace}"`,
-    disable: `datapack disable "file/${module.namespace}"`,
-    mark_uninstalled:
-      `data modify entity d-e-a-d-beef ` +
-      `Item.tag.imp.registry[{id: ${module.namespace}}].installed set value false`,
-    forget:
-      `data remove entity d-e-a-d-beef ` +
-      `Item.tag.imp.registry[{id: ${module.namespace}}]`
-  };
-
-  // ---------------------------------------------------------------------------
-
   const registrantNbt = {
     title: module.title,
     color: module.color,
@@ -321,13 +144,50 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     manage_function: module.manage_function,
     setup_function: module.setup_function,
     teardown_function: module.teardown_function,
+
     // extras
     version_major: Number(module.version.split(".")[0]),
     version_minor: Number(module.version.split(".")[1]),
     version_patch: Number(module.version.split(".")[2].split("-")[0]),
     version_label: module.version.split("-")[1],
-    components: registrantNbtTextComponents,
-    commands: registrantNbtDispatchCommands
+
+    // text components
+    components: {
+      title: JSON.stringify(makeClickableTitleComponent(module)),
+      authors: JSON.stringify(makeClickableAuthorsComponent(module)),
+      color: JSON.stringify({
+        text: "",
+        color: module.color
+      }),
+      enable_button: JSON.stringify(
+        makeManageButtonComponent(module, "enable", "green")
+      ),
+      forget_button: JSON.stringify(
+        makeManageButtonComponent(module, "forget", "red")
+      ),
+      disable_button: JSON.stringify(
+        makeManageButtonComponent(module, "disable", "red")
+      ),
+      uninstall_button: JSON.stringify(
+        makeManageButtonComponent(module, "uninstall", "red")
+      )
+    },
+
+    // command strings
+    commands: {
+      setup: `function ${module.namespace}:${module.setup_function}`,
+      teardown: `function ${module.namespace}:${module.teardown_function}`,
+      enable: `datapack enable "file/${module.namespace}"`,
+      disable: `datapack disable "file/${module.namespace}"`,
+      mark_uninstalled:
+        `data modify entity d-e-a-d-beef ` +
+        `Item.tag.imp.registry[{id: ${
+          module.namespace
+        }}].installed set value false`,
+      forget:
+        `data remove entity d-e-a-d-beef ` +
+        `Item.tag.imp.registry[{id: ${module.namespace}}]`
+    }
   };
 
   return [
@@ -345,6 +205,15 @@ export function makeInstallCommands(module: DatapackModule): string[] {
 
   return commands.map(command => {
     return `${execute} ${command}`;
+  });
+}
+
+export function makePackMcMeta(module: DatapackModule) {
+  return JSON.stringify({
+    pack: {
+      pack_format: 4,
+      description: makeHoverCardComponent(module)
+    }
   });
 }
 
