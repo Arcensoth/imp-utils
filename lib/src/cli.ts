@@ -4,8 +4,8 @@ import path = require("path");
 import { DatapackModule } from "./datapack-module";
 import {
   makePackMcMeta,
-  makeManageMcfunction,
-  makeManageTagJson
+  makeManagementFunction,
+  makeManagementTag
 } from "./utils";
 
 if (process.argv.length < 3) {
@@ -17,31 +17,32 @@ const datapackPath = path.resolve(process.argv[2]);
 
 console.log("Using datapack root:", datapackPath);
 
-const moduleConfig = JSON.parse(
+const moduleJson = JSON.parse(
   fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
-) as DatapackModule;
+);
+
+const datapackModule = new DatapackModule(moduleJson);
 
 // pack.mcmeta
 const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
 console.log("Generating pack.mcmeta at:", packMcmetaPath);
-const packMcmeta = makePackMcMeta(moduleConfig);
+const packMcmeta = makePackMcMeta(datapackModule);
 fs.writeFileSync(packMcmetaPath, packMcmeta);
 
-// manage.mcfunction
-const manageMcfunctionPath = path.join(
+// management function
+const managementFunctionPath = path.join(
   datapackPath,
   "data",
-  moduleConfig.namespace,
+  datapackModule.namespace,
   "functions",
-  ".module",
-  "manage.mcfunction"
+  `${datapackModule.manage_function}.mcfunction`
 );
-console.log("Generating manage function at:", manageMcfunctionPath);
-const manageMcfunction = makeManageMcfunction(moduleConfig);
-fs.writeFileSync(manageMcfunctionPath, manageMcfunction);
+console.log("Generating management function at:", managementFunctionPath);
+const managementFunction = makeManagementFunction(datapackModule);
+fs.writeFileSync(managementFunctionPath, managementFunction);
 
-// manage.json (function tag)
-const manageTagJsonPath = path.join(
+// management tag
+const managementTagPath = path.join(
   datapackPath,
   "data",
   "imp",
@@ -49,6 +50,6 @@ const manageTagJsonPath = path.join(
   "functions",
   "manage.json"
 );
-console.log("Generating manage tag at:", manageTagJsonPath);
-const manageTagJson = makeManageTagJson(moduleConfig);
-fs.writeFileSync(manageTagJsonPath, manageTagJson);
+console.log("Generating management tag at:", managementTagPath);
+const managementTag = makeManagementTag(datapackModule);
+fs.writeFileSync(managementTagPath, managementTag);

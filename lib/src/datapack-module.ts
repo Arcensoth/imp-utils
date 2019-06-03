@@ -8,7 +8,7 @@ export interface DatapackModuleAuthor {
   url: string;
 }
 
-export interface DatapackModule {
+export class DatapackModule {
   title: string;
   color: string;
   description: string;
@@ -20,4 +20,11 @@ export interface DatapackModule {
   url: string;
   authors: DatapackModuleAuthor[];
   dependencies: DatapackModuleDependency[];
+  manage_function: string = ".module/manage";
+  setup_function: string = ".module/setup";
+  teardown_function: string = ".module/teardown";
+
+  constructor(args: any) {
+    Object.assign(this, args);
+  }
 }
