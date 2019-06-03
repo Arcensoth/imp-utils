@@ -296,6 +296,9 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     teardown: `function ${module.namespace}:${module.teardown_function}`,
     enable: `datapack enable "file/${module.namespace}"`,
     disable: `datapack disable "file/${module.namespace}"`,
+    mark_uninstalled:
+      `data modify entity d-e-a-d-beef ` +
+      `Item.tag.imp.registry[{id: ${module.namespace}}].installed set value false`,
     forget:
       `data remove entity d-e-a-d-beef ` +
       `Item.tag.imp.registry[{id: ${module.namespace}}]`
