@@ -1,13 +1,16 @@
 {
-  "name": "imp-utils",
-  "displayName": "imp-utils",
-  "description": "IMP datapack utilities.",
+  "name": "minecraft-imp-utils",
   "version": "0.1.0-dev",
+  "description": "IMP utilities for Minecraft datapacks.",
   "repository": "https://github.com/Arcensoth/imp-utils",
+  "author": "Arcensoth",
   "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "compile-lib": "tsc -b lib -v",
-    "cli": "npm run compile-lib && node lib/out/cli.js"
+    "prepare": "tsc",
+    "build": "tsc -b . -v",
+    "cli": "npm run build && node dist/cli.js"
   },
   "devDependencies": {
     "@types/node": "latest",

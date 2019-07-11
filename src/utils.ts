@@ -10,7 +10,7 @@ export function makeHoverCardComponent(module: DatapackModule) {
     module.description,
     "\n",
     {
-      text: `${module.version} for Minecraft ${module.minecraft_version}`,
+      text: `${module.version} for Minecraft ${module.minecraftVersion}`,
       color: "dark_gray"
     },
     "\n",
@@ -134,16 +134,16 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     color: module.color,
     description: module.description,
     version: module.version,
-    minecraft_version: module.minecraft_version,
+    minecraft_version: module.minecraftVersion,
     category: module.category,
     namespace: module.namespace,
     scorespace: module.scorespace,
     url: module.url,
     authors: module.authors,
     dependencies: module.dependencies,
-    manage_function: module.manage_function,
-    setup_function: module.setup_function,
-    teardown_function: module.teardown_function,
+    manage_function: module.manageFunction,
+    setup_function: module.setupFunction,
+    teardown_function: module.teardownFunction,
 
     // extras
     version_major: Number(module.version.split(".")[0]),
@@ -178,8 +178,8 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 
     // command strings
     commands: {
-      setup: `function ${module.namespace}:${module.setup_function}`,
-      teardown: `function ${module.namespace}:${module.teardown_function}`,
+      setup: `function ${module.namespace}:${module.setupFunction}`,
+      teardown: `function ${module.namespace}:${module.teardownFunction}`,
       enable: `datapack enable "file/${module.namespace}"`,
       disable: `datapack disable "file/${module.namespace}"`,
       mark_uninstalled:
@@ -204,7 +204,7 @@ export function makeInstallCommands(module: DatapackModule): string[] {
     `execute if data entity @s ` +
     `Item.tag.__args__.imp.manage{install: [${module.namespace}]} run`;
 
-  const commands = [`function ${module.namespace}:${module.setup_function}`];
+  const commands = [`function ${module.namespace}:${module.setupFunction}`];
 
   return commands.map(command => {
     return `${execute} ${command}`;
@@ -230,6 +230,6 @@ export function makeManagementFunction(module: DatapackModule) {
 
 export function makeManagementTag(module: DatapackModule) {
   return JSON.stringify({
-    values: [`${module.namespace}:${module.manage_function}`]
+    values: [`${module.namespace}:${module.manageFunction}`]
   });
 }

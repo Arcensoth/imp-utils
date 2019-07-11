@@ -21,7 +21,7 @@ const moduleJson = JSON.parse(
   fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
 );
 
-const datapackModule = new DatapackModule(moduleJson);
+const datapackModule = DatapackModule.fromObject(moduleJson);
 
 // pack.mcmeta
 const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
@@ -35,7 +35,7 @@ const managementFunctionPath = path.join(
   "data",
   datapackModule.namespace,
   "functions",
-  `${datapackModule.manage_function}.mcfunction`
+  `${datapackModule.manageFunction}.mcfunction`
 );
 console.log("Generating management function at:", managementFunctionPath);
 const managementFunction = makeManagementFunction(datapackModule);

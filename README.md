@@ -1,2 +1,2 @@
 # imp-utils
-IMP datapack utilities.
+IMP utilities for Minecraft datapacks.
