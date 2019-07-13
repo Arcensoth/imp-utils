@@ -180,8 +180,20 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     commands: {
       setup: `function ${module.namespace}:${module.setupFunction}`,
       teardown: `function ${module.namespace}:${module.teardownFunction}`,
-      enable: `datapack enable "file/${module.namespace}"`,
-      disable: `datapack disable "file/${module.namespace}"`,
+      enable: [
+        `datapack enable "file/${module.namespace}"`,
+        `datapack enable "file/${module.namespace}.zip"`,
+        `datapack enable "file/${module.namespace}.min.zip"`,
+        `datapack enable "file/${module.namespace}-${module.version}.zip"`,
+        `datapack enable "file/${module.namespace}-${module.version}.min.zip"`
+      ],
+      disable: [
+        `datapack disable "file/${module.namespace}"`,
+        `datapack disable "file/${module.namespace}.zip"`,
+        `datapack disable "file/${module.namespace}.min.zip"`,
+        `datapack disable "file/${module.namespace}-${module.version}.zip"`,
+        `datapack disable "file/${module.namespace}-${module.version}.min.zip"`
+      ],
       mark_uninstalled:
         `data modify entity d-e-a-d-beef ` +
         `Item.tag.imp.registry[{id: ${
