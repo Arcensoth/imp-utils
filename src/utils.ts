@@ -93,13 +93,13 @@ export function makeManageButtonCommand(
     makeManageDispatchCommandsString(module, route) +
     "}}";
 
-  console.log(`Length of command for ${route} button: ${buttonCommand.length}`);
-  console.log(`    ${buttonCommand}`);
+  console.debug(
+    `Length of command for ${route} button: ${buttonCommand.length}`
+  );
+  console.debug(`    ${buttonCommand}`);
 
   if (buttonCommand.length > 255) {
-    console.error(
-      new Error(`Command for ${route} button exceeds chat command limit`)
-    );
+    console.warn(`Command for ${route} button exceeds chat command limit`);
   }
 
   return buttonCommand;
