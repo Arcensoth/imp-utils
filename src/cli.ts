@@ -1,7 +1,7 @@
 import fs = require("fs");
 import path = require("path");
 
-import { DatapackModule } from "./datapack-module";
+import { DatapackModule, DatapackModuleProperties } from "./datapack-module";
 import {
   makePackMcMeta,
   makeManagementFunction,
@@ -17,7 +17,7 @@ const datapackPath = path.resolve(process.argv[2]);
 
 console.log("Using datapack root:", datapackPath);
 
-const moduleJson = JSON.parse(
+const moduleJson: DatapackModuleProperties = JSON.parse(
   fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
 );
 

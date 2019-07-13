@@ -1,6 +1,6 @@
 {
   "name": "minecraft-imp-utils",
-  "version": "0.1.0",
+  "version": "0.1.1-dev",
   "description": "IMP utilities for Minecraft datapacks.",
   "repository": "https://github.com/Arcensoth/imp-utils",
   "author": "Arcensoth",

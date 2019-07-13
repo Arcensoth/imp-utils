@@ -5,7 +5,24 @@ export interface DatapackModuleDependency {
 
 export interface DatapackModuleAuthor {
   name: string;
-  url: string;
+  url?: string;
+}
+
+export interface DatapackModuleProperties {
+  title: string;
+  color: string;
+  description: string;
+  version: string;
+  minecraft_version: string;
+  category: string;
+  namespace: string;
+  scorespace: string;
+  authors: DatapackModuleAuthor[];
+  dependencies?: DatapackModuleDependency[];
+  url?: string;
+  manage_function?: string;
+  setup_function?: string;
+  teardown_function?: string;
 }
 
 export class DatapackModule {
@@ -26,7 +43,7 @@ export class DatapackModule {
     public teardownFunction: string = ".module/teardown"
   ) {}
 
-  public static fromObject(obj: any): DatapackModule {
+  public static fromObject(obj: DatapackModuleProperties): DatapackModule {
     const dp = new DatapackModule(
       obj.title,
       obj.color,
@@ -44,5 +61,24 @@ export class DatapackModule {
       obj.teardown_function
     );
     return dp;
+  }
+
+  public toObject(): DatapackModuleProperties {
+    return {
+      title: this.title,
+      color: this.color,
+      description: this.description,
+      version: this.version,
+      minecraft_version: this.minecraftVersion,
+      category: this.category,
+      namespace: this.namespace,
+      scorespace: this.scorespace,
+      authors: this.authors,
+      dependencies: this.dependencies,
+      url: this.url,
+      manage_function: this.manageFunction,
+      setup_function: this.setupFunction,
+      teardown_function: this.teardownFunction
+    };
   }
 }
