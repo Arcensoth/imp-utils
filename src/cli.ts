@@ -1,5 +1,7 @@
 import fs = require("fs");
 import path = require("path");
+import readlineSync = require("readline-sync");
+import minimist = require("minimist");
 
 import { DatapackModule, DatapackModuleProperties } from "./datapack-module";
 import {
@@ -8,12 +10,34 @@ import {
   makeManagementTag
 } from "./utils";
 
-if (process.argv.length < 3) {
-  console.error("You must provide a datapack root");
+interface Args {
+  help: boolean;
+  datapack: string;
+  yes: boolean;
+  no: boolean;
+}
+
+function printHelp() {
+  console.log("> npm run cli -- -d <datapack> [--y] [--n]");
+}
+
+const args: Args = (minimist(process.argv.slice(2), {
+  boolean: true,
+  alias: { d: "datapack", y: "yes", n: "no" }
+}) as any) as Args;
+
+if (args.help) {
+  printHelp();
+  process.exit(0);
+}
+
+if (!args.datapack) {
+  console.error("Datapack root directory is required");
+  printHelp();
   process.exit(1);
 }
 
-const datapackPath = path.resolve(process.argv[2]);
+const datapackPath = path.resolve(args.datapack);
 
 console.log("Using datapack root:", datapackPath);
 
@@ -22,12 +46,6 @@ const moduleJson: DatapackModuleProperties = JSON.parse(
 );
 
 const datapackModule = DatapackModule.fromObject(moduleJson);
-
-// pack.mcmeta
-const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
-console.log("Generating pack.mcmeta at:", packMcmetaPath);
-const packMcmeta = makePackMcMeta(datapackModule);
-fs.writeFileSync(packMcmetaPath, packMcmeta);
 
 // management function
 const managementFunctionPath = path.join(
@@ -53,3 +71,19 @@ const managementTagPath = path.join(
 console.log("Generating management tag at:", managementTagPath);
 const managementTag = makeManagementTag(datapackModule);
 fs.writeFileSync(managementTagPath, managementTag);
+
+// pack.mcmeta
+const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
+if (
+  args.yes ||
+  !fs.existsSync(packMcmetaPath) ||
+  (!args.no && readlineSync.keyInYN("Overwrite existing pack.mcmeta?"))
+) {
+  console.log("Generating pack.mcmeta at:", packMcmetaPath);
+  const packMcmeta = makePackMcMeta(datapackModule);
+  fs.writeFileSync(packMcmetaPath, packMcmeta);
+} else {
+  console.log("Skipped pack.mcmeta");
+}
+
+console.log('All done!')

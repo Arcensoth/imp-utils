@@ -10,10 +10,18 @@
   "scripts": {
     "prepare": "tsc",
     "build": "tsc -b . -v",
-    "cli": "npm run build && node dist/cli.js"
+    "postinstall": "npm run build",
+    "dev-cli": "npm run build && node dist/cli.js",
+    "cli": "node dist/cli.js"
   },
   "devDependencies": {
     "@types/node": "latest",
     "typescript": "^3.4.4"
+  },
+  "dependencies": {
+    "@types/minimist": "^1.2.0",
+    "@types/readline-sync": "^1.4.3",
+    "minimist": "^1.2.0",
+    "readline-sync": "^1.4.10"
   }
 }
