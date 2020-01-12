@@ -68,38 +68,38 @@ export function makeClickableAuthorsComponent(module: DatapackModule) {
 
 export function makeManageDispatchCommands(
   module: DatapackModule,
-  route: string
+  action: string
 ): string[] {
   return [
-    "execute as d-e-a-d-beef run data modify entity @s Item.tag.__args__.imp.manage.entry " +
-      `set from entity @s Item.tag.imp.registry[{id:${module.namespace}}]`,
-    `function imp:manage/${route}`
+    "data modify storage imp.__temp__:api/v0/manage __input__ " +
+      `set value {id:${module.namespace},action:${action}}`,
+    "function imp:api/v0/manage"
   ];
 }
 
 export function makeManageDispatchCommandsString(
   module: DatapackModule,
-  route: string
+  action: string
 ): string {
-  return "['" + makeManageDispatchCommands(module, route).join("','") + "']";
+  return "['" + makeManageDispatchCommands(module, action).join("','") + "']";
 }
 
 export function makeManageButtonCommand(
   module: DatapackModule,
-  route: string
+  action: string
 ): string {
   const buttonCommand =
     `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:` +
-    makeManageDispatchCommandsString(module, route) +
+    makeManageDispatchCommandsString(module, action) +
     "}}";
 
   console.debug(
-    `Length of command for ${route} button: ${buttonCommand.length}`
+    `Length of command for ${action} button: ${buttonCommand.length}`
   );
   console.debug(`    ${buttonCommand}`);
 
   if (buttonCommand.length > 255) {
-    console.warn(`Command for ${route} button exceeds chat command limit`);
+    console.warn(`Command for ${action} button exceeds chat command limit`);
   }
 
   return buttonCommand;
@@ -107,7 +107,7 @@ export function makeManageButtonCommand(
 
 export function makeManageButtonComponent(
   module: DatapackModule,
-  route: string,
+  action: string,
   color: string
 ): any {
   return {
@@ -116,20 +116,21 @@ export function makeManageButtonComponent(
       action: "show_text",
       value: [
         { text: "Click to ", color: color },
-        { text: route, bold: true },
+        { text: action, bold: true },
         " ",
         { text: module.title, color: module.color }
       ]
     },
     clickEvent: {
       action: "run_command",
-      value: makeManageButtonCommand(module, route)
+      value: makeManageButtonCommand(module, action)
     }
   };
 }
 
 export function makeRegisterCommands(module: DatapackModule): string[] {
   const registrantNbt = {
+    module_format: module.moduleFormat,
     title: module.title,
     color: module.color,
     description: module.description,
@@ -178,6 +179,8 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 
     // command strings
     commands: {
+      pause: `function ${module.namespace}:${module.pauseFunction}`,
+      resume: `function ${module.namespace}:${module.resumeFunction}`,
       setup: `function ${module.namespace}:${module.setupFunction}`,
       teardown: `function ${module.namespace}:${module.teardownFunction}`,
       enable: [
@@ -193,28 +196,27 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
         `datapack disable "file/${module.namespace}.min.zip"`,
         `datapack disable "file/${module.namespace}-${module.version}.zip"`,
         `datapack disable "file/${module.namespace}-${module.version}.min.zip"`
-      ],
-      mark_uninstalled:
-        `data modify entity d-e-a-d-beef ` +
-        `Item.tag.imp.registry[{id: ${
-          module.namespace
-        }}].installed set value false`,
-      forget:
-        `data remove entity d-e-a-d-beef ` +
-        `Item.tag.imp.registry[{id: ${module.namespace}}]`
+      ]
     }
   };
 
-  return [
-    "execute if data entity @s Item.tag.__args__.imp.manage{register: true} run data modify entity @s Item.tag.__args__.imp.registrants append value " +
+  const execute =
+    `execute if data storage imp.__temp__:api/manage ` + `__temp__{register: true} run`;
+
+  const commands = [
+    "data modify storage imp.__temp__:api/manage __temp__.registrants append value " +
       JSON.stringify(registrantNbt)
   ];
+
+  return commands.map(command => {
+    return `${execute} ${command}`;
+  });
 }
 
 export function makeInstallCommands(module: DatapackModule): string[] {
   const execute =
-    `execute if data entity @s ` +
-    `Item.tag.__args__.imp.manage{install: [${module.namespace}]} run`;
+    `execute if data storage imp.__temp__:api/manage ` +
+    `__temp__{install: [${module.namespace}]} run`;
 
   const commands = [`function ${module.namespace}:${module.setupFunction}`];
 
@@ -226,7 +228,7 @@ export function makeInstallCommands(module: DatapackModule): string[] {
 export function makePackMcMeta(module: DatapackModule) {
   return JSON.stringify({
     pack: {
-      pack_format: 4,
+      pack_format: 5,
       description: makeHoverCardComponent(module)
     }
   });

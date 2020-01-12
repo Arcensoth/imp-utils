@@ -9,6 +9,7 @@ export interface DatapackModuleAuthor {
 }
 
 export interface DatapackModuleProperties {
+  module_format: string;
   title: string;
   color: string;
   description: string;
@@ -27,6 +28,7 @@ export interface DatapackModuleProperties {
 
 export class DatapackModule {
   constructor(
+    public moduleFormat: string,
     public title: string,
     public color: string,
     public description: string,
@@ -39,12 +41,15 @@ export class DatapackModule {
     public dependencies: DatapackModuleDependency[] = [],
     public url?: string,
     public manageFunction: string = ".module/manage",
+    public pauseFunction: string = ".module/pause",
+    public resumeFunction: string = ".module/resume",
     public setupFunction: string = ".module/setup",
     public teardownFunction: string = ".module/teardown"
   ) {}
 
   public static fromObject(obj: DatapackModuleProperties): DatapackModule {
     const dp = new DatapackModule(
+      obj.module_format,
       obj.title,
       obj.color,
       obj.description,
@@ -65,6 +70,7 @@ export class DatapackModule {
 
   public toObject(): DatapackModuleProperties {
     return {
+      module_format: this.moduleFormat,
       title: this.title,
       color: this.color,
       description: this.description,
