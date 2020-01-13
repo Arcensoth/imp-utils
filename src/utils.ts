@@ -10,7 +10,7 @@ export function makeHoverCardComponent(module: DatapackModule) {
     module.description,
     "\n",
     {
-      text: `${module.version} for Minecraft ${module.minecraftVersion}`,
+      text: `Version ${module.version} for Minecraft ${module.minecraftVersion}`,
       color: "dark_gray"
     },
     "\n",
