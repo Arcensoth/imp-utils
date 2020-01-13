@@ -1,4 +1,8 @@
-import { DatapackModule } from "./datapack-module";
+import fs = require("fs");
+import path = require("path");
+import readlineSync = require("readline-sync");
+
+import { DatapackModule, DatapackModuleProperties } from "./datapack-module";
 
 export const TECHNICAL_ITEM = "barrier";
 
@@ -201,7 +205,8 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
   };
 
   const execute =
-    `execute if data storage imp.__temp__:api/manage ` + `__temp__{register: true} run`;
+    `execute if data storage imp.__temp__:api/manage ` +
+    `__temp__{register: true} run`;
 
   const commands = [
     "data modify storage imp.__temp__:api/manage __temp__.registrants append value " +
@@ -246,4 +251,61 @@ export function makeManagementTag(module: DatapackModule) {
   return JSON.stringify({
     values: [`${module.namespace}:${module.manageFunction}`]
   });
+}
+
+export function processDatapack(
+  datapackLocation: string,
+  answerYes: boolean,
+  answerNo: boolean
+): void {
+  const datapackPath = path.resolve(datapackLocation);
+
+  console.log("Processing datapack at:", datapackPath);
+
+  const moduleJson: DatapackModuleProperties = JSON.parse(
+    fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
+  );
+
+  const datapackModule = DatapackModule.fromObject(moduleJson);
+
+  // management function
+  const managementFunctionPath = path.join(
+    datapackPath,
+    "data",
+    datapackModule.namespace,
+    "functions",
+    `${datapackModule.manageFunction}.mcfunction`
+  );
+  console.log("Generating management function at:", managementFunctionPath);
+  const managementFunction = makeManagementFunction(datapackModule);
+  fs.writeFileSync(managementFunctionPath, managementFunction);
+
+  // management tag
+  const managementTagPath = path.join(
+    datapackPath,
+    "data",
+    "imp",
+    "tags",
+    "functions",
+    "manage.json"
+  );
+  console.log("Generating management tag at:", managementTagPath);
+  const managementTag = makeManagementTag(datapackModule);
+  fs.writeFileSync(managementTagPath, managementTag);
+
+  // pack.mcmeta
+  const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");
+  if (
+    answerYes ||
+    !fs.existsSync(packMcmetaPath) ||
+    (!answerNo && readlineSync.keyInYN("Overwrite existing pack.mcmeta?"))
+  ) {
+    console.log("Generating pack.mcmeta at:", packMcmetaPath);
+    const packMcmeta = makePackMcMeta(datapackModule);
+    fs.writeFileSync(packMcmetaPath, packMcmeta);
+  } else {
+    console.log("Skipped pack.mcmeta");
+  }
+
+  console.log("All done!");
 }
