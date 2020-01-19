@@ -190,16 +190,12 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       enable: [
         `datapack enable "file/${module.namespace}"`,
         `datapack enable "file/${module.namespace}.zip"`,
-        `datapack enable "file/${module.namespace}.min.zip"`,
-        `datapack enable "file/${module.namespace}-${module.version}.zip"`,
-        `datapack enable "file/${module.namespace}-${module.version}.min.zip"`
+        `datapack enable "file/${module.namespace}-${module.version}.zip"`
       ],
       disable: [
         `datapack disable "file/${module.namespace}"`,
         `datapack disable "file/${module.namespace}.zip"`,
-        `datapack disable "file/${module.namespace}.min.zip"`,
-        `datapack disable "file/${module.namespace}-${module.version}.zip"`,
-        `datapack disable "file/${module.namespace}-${module.version}.min.zip"`
+        `datapack disable "file/${module.namespace}-${module.version}.zip"`
       ]
     }
   };
