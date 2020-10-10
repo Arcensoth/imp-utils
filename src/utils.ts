@@ -229,7 +229,7 @@ export function makeInstallCommands(module: DatapackModule): string[] {
 export function makePackMcMeta(module: DatapackModule) {
   return JSON.stringify({
     pack: {
-      pack_format: 5,
+      pack_format: 6,
       description: makeHoverCardComponent(module)
     }
   });
