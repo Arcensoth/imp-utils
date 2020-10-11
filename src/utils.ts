@@ -284,7 +284,12 @@ export function makePackMcMeta(module: DatapackModule) {
   return JSON.stringify({
     pack: {
       pack_format: 6,
-      description: makeHoverCardComponent(module),
+      description: makeHoverCardComponent(module).map((element) => {
+        if (element === "\\n") {
+          return "\n";
+        }
+        return element;
+      }),
     },
   });
 }
