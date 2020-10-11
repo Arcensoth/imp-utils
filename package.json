@@ -16,12 +16,12 @@
   },
   "devDependencies": {
     "@types/node": "latest",
+    "@types/minimist": "^1.2.0",
+    "@types/readline-sync": "^1.4.3",
     "typescript": "^3.4.4"
   },
   "dependencies": {
-    "@types/minimist": "^1.2.0",
-    "@types/readline-sync": "^1.4.3",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "readline-sync": "^1.4.10"
   }
 }
