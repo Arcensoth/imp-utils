@@ -1,6 +1,5 @@
-export interface DatapackModuleDependency {
-  namespace: string;
-  version: string;
+export interface DatapackModuleDependencyMap {
+  [id: string]: string;
 }
 
 export interface DatapackModuleAuthor {
@@ -19,7 +18,7 @@ export interface DatapackModuleProperties {
   namespace: string;
   scorespace: string;
   authors: DatapackModuleAuthor[];
-  dependencies?: DatapackModuleDependency[];
+  dependencies?: DatapackModuleDependencyMap;
   url?: string;
   manage_function?: string;
   setup_function?: string;
@@ -38,7 +37,7 @@ export class DatapackModule {
     public namespace: string,
     public scorespace: string,
     public authors: DatapackModuleAuthor[],
-    public dependencies: DatapackModuleDependency[] = [],
+    public dependencies: DatapackModuleDependencyMap = {},
     public url?: string,
     public manageFunction: string = ".module/manage",
     public pauseFunction: string = ".module/pause",
@@ -84,7 +83,7 @@ export class DatapackModule {
       url: this.url,
       manage_function: this.manageFunction,
       setup_function: this.setupFunction,
-      teardown_function: this.teardownFunction
+      teardown_function: this.teardownFunction,
     };
   }
 }

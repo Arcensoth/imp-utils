@@ -145,10 +145,14 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     scorespace: module.scorespace,
     url: module.url,
     authors: module.authors,
-    dependencies: module.dependencies,
     manage_function: module.manageFunction,
     setup_function: module.setupFunction,
     teardown_function: module.teardownFunction,
+
+    // dependencies
+    dependencies: Object.keys(module.dependencies).map((key) => {
+      return { id: key, version: module.dependencies[key] };
+    }),
 
     // extras
     version_major: Number(module.version.split(".")[0]),
