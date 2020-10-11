@@ -10,14 +10,14 @@ export function makeHoverCardComponent(module: DatapackModule) {
   const components = [
     { text: "", color: "gray" },
     { text: module.title, color: module.color },
-    "\n",
+    "\\n",
     module.description,
-    "\n",
+    "\\n",
     {
       text: `Version ${module.version} for Minecraft ${module.minecraftVersion}`,
       color: "dark_gray",
     },
-    "\n",
+    "\\n",
     "By ",
   ];
 
@@ -85,7 +85,8 @@ export function makeManageDispatchCommandsString(
   module: DatapackModule,
   action: string
 ): string {
-  return "['" + makeManageDispatchCommands(module, action).join("','") + "']";
+  const commands = makeManageDispatchCommands(module, action);
+  return JSON.stringify(commands);
 }
 
 export function makeManageButtonCommand(
@@ -132,6 +133,16 @@ export function makeManageButtonComponent(
   };
 }
 
+export function stringifyManageButtonComponent(
+  module: DatapackModule,
+  action: string,
+  color: string
+): any {
+  return JSON.stringify(
+    makeManageButtonComponent(module, action, color)
+  ).replace(/\\"/g, '\\\\"');
+}
+
 export function makeRegisterCommands(module: DatapackModule): string[] {
   const registrantNbt = {
     module_format: module.moduleFormat,
@@ -160,31 +171,6 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     version_patch: Number(module.version.split(".")[2].split("-")[0]),
     version_label: module.version.split("-")[1],
 
-    // text components
-    components: {
-      title: JSON.stringify(makeClickableTitleComponent(module)),
-      authors: JSON.stringify(makeClickableAuthorsComponent(module)),
-      color: JSON.stringify({
-        text: "",
-        color: module.color,
-      }),
-      enable_button: JSON.stringify(
-        makeManageButtonComponent(module, "enable", "green")
-      ),
-      forget_button: JSON.stringify(
-        makeManageButtonComponent(module, "forget", "red")
-      ),
-      disable_button: JSON.stringify(
-        makeManageButtonComponent(module, "disable", "red")
-      ),
-      uninstall_button: JSON.stringify(
-        makeManageButtonComponent(module, "uninstall", "red")
-      ),
-      reinstall_button: JSON.stringify(
-        makeManageButtonComponent(module, "reinstall", "yellow")
-      ),
-    },
-
     // command strings
     commands: {
       pause: `function ${module.namespace}:${module.pauseFunction}`,
@@ -202,6 +188,29 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
         `datapack disable "file/${module.namespace}-${module.version}.zip"`,
       ],
     },
+
+    // text components
+    components: {
+      title: JSON.stringify(makeClickableTitleComponent(module)),
+      authors: JSON.stringify(makeClickableAuthorsComponent(module)),
+      color: JSON.stringify({
+        text: "",
+        color: module.color,
+      }),
+      enable_button: stringifyManageButtonComponent(module, "enable", "green"),
+      forget_button: stringifyManageButtonComponent(module, "forget", "red"),
+      disable_button: stringifyManageButtonComponent(module, "disable", "red"),
+      uninstall_button: stringifyManageButtonComponent(
+        module,
+        "uninstall",
+        "red"
+      ),
+      reinstall_button: stringifyManageButtonComponent(
+        module,
+        "reinstall",
+        "yellow"
+      ),
+    },
   };
 
   const execute =
@@ -210,12 +219,32 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 
   const commands = [
     "data modify storage imp.__temp__:api/manage __temp__.registrants append value " +
-      JSON.stringify(registrantNbt),
+      stringiyfyNbt(registrantNbt),
   ];
 
   return commands.map((command) => {
     return `${execute} ${command}`;
   });
+}
+
+function stringiyfyNbt(nbt: any): string {
+  if (typeof nbt === "boolean") {
+    return nbt ? "true" : "false";
+  } else if (typeof nbt === "string") {
+    return `'${nbt}'`;
+  } else if (typeof nbt === "number") {
+    return nbt.toString();
+  } else if (Array.isArray(nbt)) {
+    const items = nbt.map((item) => stringiyfyNbt(item));
+    return "[" + items.join(", ") + "]";
+  } else if (typeof nbt === "object") {
+    const pairs = Object.keys(nbt).map((key) => {
+      const value = stringiyfyNbt(nbt[key]);
+      return `${key}: ${value}`;
+    });
+    return "{" + pairs.join(", ") + "}";
+  }
+  throw Error(`Cannot stringify NBT: ${nbt}`);
 }
 
 export function makeInstallCommands(module: DatapackModule): string[] {
