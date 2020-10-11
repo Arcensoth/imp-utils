@@ -23,6 +23,7 @@ export interface DatapackModuleProperties {
   manage_function?: string;
   setup_function?: string;
   teardown_function?: string;
+  menu_function?: string;
 }
 
 export class DatapackModule {
@@ -43,7 +44,8 @@ export class DatapackModule {
     public pauseFunction: string = ".module/pause",
     public resumeFunction: string = ".module/resume",
     public setupFunction: string = ".module/setup",
-    public teardownFunction: string = ".module/teardown"
+    public teardownFunction: string = ".module/teardown",
+    public menuFunction: string = ".module/menu"
   ) {}
 
   public static fromObject(obj: DatapackModuleProperties): DatapackModule {
@@ -62,7 +64,8 @@ export class DatapackModule {
       obj.url,
       obj.manage_function,
       obj.setup_function,
-      obj.teardown_function
+      obj.teardown_function,
+      obj.menu_function
     );
     return dp;
   }
@@ -84,6 +87,7 @@ export class DatapackModule {
       manage_function: this.manageFunction,
       setup_function: this.setupFunction,
       teardown_function: this.teardownFunction,
+      menu_function: this.menuFunction,
     };
   }
 }
