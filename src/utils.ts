@@ -15,13 +15,13 @@ export function makeHoverCardComponent(module: DatapackModule) {
     "\n",
     {
       text: `Version ${module.version} for Minecraft ${module.minecraftVersion}`,
-      color: "dark_gray"
+      color: "dark_gray",
     },
     "\n",
-    "By "
+    "By ",
   ];
 
-  module.authors.forEach(author => {
+  module.authors.forEach((author) => {
     components.push({ text: author.name, color: "yellow" });
     components.push(", ");
   });
@@ -36,28 +36,28 @@ export function makeClickableTitleComponent(module: DatapackModule) {
     text: module.title,
     hoverEvent: {
       action: "show_text",
-      value: makeHoverCardComponent(module)
+      value: makeHoverCardComponent(module),
     },
     clickEvent: {
       action: "open_url",
-      value: module.url
-    }
+      value: module.url,
+    },
   };
 }
 
 export function makeClickableAuthorsComponent(module: DatapackModule) {
   const components: any[] = [{ text: "", color: "gray" }];
 
-  module.authors.forEach(author => {
+  module.authors.forEach((author) => {
     if (author.url) {
       components.push({
         text: author.name,
         color: "yellow",
         hoverEvent: {
           action: "show_text",
-          value: author.url
+          value: author.url,
         },
-        clickEvent: { action: "open_url", value: author.url }
+        clickEvent: { action: "open_url", value: author.url },
       });
     } else {
       components.push({ text: author.name, color: "yellow" });
@@ -77,7 +77,7 @@ export function makeManageDispatchCommands(
   return [
     "data modify storage imp.__temp__:api/v0/manage __input__ " +
       `set value {id:${module.namespace},action:${action}}`,
-    "function imp:api/v0/manage"
+    "function imp:api/v0/manage",
   ];
 }
 
@@ -122,13 +122,13 @@ export function makeManageButtonComponent(
         { text: "Click to ", color: color },
         { text: action, bold: true },
         " ",
-        { text: module.title, color: module.color }
-      ]
+        { text: module.title, color: module.color },
+      ],
     },
     clickEvent: {
       action: "run_command",
-      value: makeManageButtonCommand(module, action)
-    }
+      value: makeManageButtonCommand(module, action),
+    },
   };
 }
 
@@ -162,7 +162,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       authors: JSON.stringify(makeClickableAuthorsComponent(module)),
       color: JSON.stringify({
         text: "",
-        color: module.color
+        color: module.color,
       }),
       enable_button: JSON.stringify(
         makeManageButtonComponent(module, "enable", "green")
@@ -178,7 +178,7 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       ),
       reinstall_button: JSON.stringify(
         makeManageButtonComponent(module, "reinstall", "yellow")
-      )
+      ),
     },
 
     // command strings
@@ -190,14 +190,14 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
       enable: [
         `datapack enable "file/${module.namespace}"`,
         `datapack enable "file/${module.namespace}.zip"`,
-        `datapack enable "file/${module.namespace}-${module.version}.zip"`
+        `datapack enable "file/${module.namespace}-${module.version}.zip"`,
       ],
       disable: [
         `datapack disable "file/${module.namespace}"`,
         `datapack disable "file/${module.namespace}.zip"`,
-        `datapack disable "file/${module.namespace}-${module.version}.zip"`
-      ]
-    }
+        `datapack disable "file/${module.namespace}-${module.version}.zip"`,
+      ],
+    },
   };
 
   const execute =
@@ -206,10 +206,10 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
 
   const commands = [
     "data modify storage imp.__temp__:api/manage __temp__.registrants append value " +
-      JSON.stringify(registrantNbt)
+      JSON.stringify(registrantNbt),
   ];
 
-  return commands.map(command => {
+  return commands.map((command) => {
     return `${execute} ${command}`;
   });
 }
@@ -221,7 +221,7 @@ export function makeInstallCommands(module: DatapackModule): string[] {
 
   const commands = [`function ${module.namespace}:${module.setupFunction}`];
 
-  return commands.map(command => {
+  return commands.map((command) => {
     return `${execute} ${command}`;
   });
 }
@@ -230,8 +230,8 @@ export function makePackMcMeta(module: DatapackModule) {
   return JSON.stringify({
     pack: {
       pack_format: 6,
-      description: makeHoverCardComponent(module)
-    }
+      description: makeHoverCardComponent(module),
+    },
   });
 }
 
@@ -239,13 +239,13 @@ export function makeManagementFunction(module: DatapackModule) {
   return [
     ...makeRegisterCommands(module),
     ...makeInstallCommands(module),
-    ""
+    "",
   ].join("\n");
 }
 
 export function makeManagementTag(module: DatapackModule) {
   return JSON.stringify({
-    values: [`${module.namespace}:${module.manageFunction}`]
+    values: [`${module.namespace}:${module.manageFunction}`],
   });
 }
 
