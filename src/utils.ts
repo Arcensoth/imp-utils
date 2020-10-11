@@ -143,13 +143,20 @@ export function stringifyManageButtonComponent(
   ).replace(/\\"/g, '\\\\"');
 }
 
+export function makeVersionComponents(versionString: string): number[] {
+  const withoutLabel = versionString.split("-")[0];
+  const stringComponents = withoutLabel.split(".");
+  const components = stringComponents.map((c) => Number(c));
+  return components;
+}
+
 export function makeRegisterCommands(module: DatapackModule): string[] {
   const registrantNbt = {
     module_format: module.moduleFormat,
     title: module.title,
     color: module.color,
     description: module.description,
-    version: module.version,
+    version_string: module.version,
     minecraft_version: module.minecraftVersion,
     category: module.category,
     namespace: module.namespace,
@@ -160,16 +167,16 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     setup_function: module.setupFunction,
     teardown_function: module.teardownFunction,
 
+    // version
+    version: makeVersionComponents(module.version),
+
     // dependencies
     dependencies: Object.keys(module.dependencies).map((key) => {
-      return { id: key, version: module.dependencies[key] };
+      return {
+        id: key,
+        version: makeVersionComponents(module.dependencies[key]),
+      };
     }),
-
-    // extras
-    version_major: Number(module.version.split(".")[0]),
-    version_minor: Number(module.version.split(".")[1]),
-    version_patch: Number(module.version.split(".")[2].split("-")[0]),
-    version_label: module.version.split("-")[1],
 
     // command strings
     commands: {
