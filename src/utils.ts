@@ -46,17 +46,20 @@ export function makeClickableTitleComponent(module: DatapackModule) {
 }
 
 export function makeClickableWebsiteComponent(module: DatapackModule) {
-  return {
-    text: "Visit Website",
+  const component: any = {
+    text: "",
     hoverEvent: {
       action: "show_text",
-      value: module.url,
-    },
-    clickEvent: {
-      action: "open_url",
-      value: module.url,
+      value: module.url || "No website",
     },
   };
+  if (module.url) {
+    component.clickEvent = {
+      action: "open_url",
+      value: module.url,
+    };
+  }
+  return component;
 }
 
 export function makeClickableAuthorsComponent(module: DatapackModule) {
@@ -165,7 +168,7 @@ export function makeVersionComponents(versionString: string): number[] {
 }
 
 export function makeRegisterCommands(module: DatapackModule): string[] {
-  const registrantNbt = {
+  const registrantNbt: any = {
     module_format: module.moduleFormat,
     title: module.title,
     color: module.color,
@@ -175,7 +178,6 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
     category: module.category,
     namespace: module.namespace,
     scorespace: module.scorespace,
-    url: module.url,
     authors: module.authors,
     manage_function: module.manageFunction,
     setup_function: module.setupFunction,
@@ -231,8 +233,14 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
         "reinstall",
         "yellow"
       ),
+      website_button: JSON.stringify(makeClickableWebsiteComponent(module)),
     },
   };
+
+  // optionals
+  if (module.url) {
+    registrantNbt.url = module.url;
+  }
 
   const execute =
     `execute if data storage imp.__temp__:api/manage ` +
