@@ -39,6 +39,20 @@ export function makeClickableTitleComponent(module: DatapackModule) {
       value: makeHoverCardComponent(module),
     },
     clickEvent: {
+      action: "run_command",
+      value: `/function ${module.namespace}:${module.menuFunction}`,
+    },
+  };
+}
+
+export function makeClickableWebsiteComponent(module: DatapackModule) {
+  return {
+    text: "Visit Website",
+    hoverEvent: {
+      action: "show_text",
+      value: module.url,
+    },
+    clickEvent: {
       action: "open_url",
       value: module.url,
     },
@@ -217,22 +231,6 @@ export function makeRegisterCommands(module: DatapackModule): string[] {
         "reinstall",
         "yellow"
       ),
-      menu_button: JSON.stringify({
-        text: "",
-        hoverEvent: {
-          action: "show_text",
-          value: [
-            { text: "Click to show ", color: "light_purple" },
-            { text: "menu", bold: true },
-            " for ",
-            { text: module.title, color: module.color },
-          ],
-        },
-        clickEvent: {
-          action: "run_command",
-          value: `/function ${module.namespace}:${module.menuFunction}`,
-        },
-      }),
     },
   };
 
