@@ -1,6 +1,6 @@
 {
   "name": "minecraft-imp-utils",
-  "version": "0.4.0-alpha.0",
+  "version": "0.3.0-alpha.0",
   "description": "IMP utilities for Minecraft datapacks.",
   "repository": "https://github.com/Arcensoth/imp-utils",
   "author": "Arcensoth",
@@ -18,10 +18,12 @@
     "@types/node": "latest",
     "@types/minimist": "^1.2.0",
     "@types/readline-sync": "^1.4.3",
+    "@types/semver": "^7.3.4",
     "typescript": "^3.4.4"
   },
   "dependencies": {
     "minimist": "^1.2.5",
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "semver": "^7.3.2"
   }
 }

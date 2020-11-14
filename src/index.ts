@@ -1,2 +1,1 @@
-export * from "./datapack-module";
-export * from "./utils";
+export * from "./lib";
