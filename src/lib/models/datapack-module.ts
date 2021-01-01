@@ -255,12 +255,10 @@ export class DatapackModule {
   }
 
   public get registerCommands(): string[] {
-    const execute =
-      `execute if data storage imp.__temp__:api/manage ` + `__temp__{register: true} run`;
+    const execute = `execute if data storage imp:io ` + `{register: true} run`;
 
     const commands = [
-      "data modify storage imp.__temp__:api/manage __temp__.registrants append value " +
-        stringiyfyNbt(this.registrantNbt),
+      "data modify storage imp:io registrants append value " + stringiyfyNbt(this.registrantNbt),
     ];
 
     return commands.map((command) => {
@@ -269,9 +267,7 @@ export class DatapackModule {
   }
 
   public get installCommands(): string[] {
-    const execute =
-      `execute if data storage imp.__temp__:api/manage ` +
-      `__temp__{install: [${this.namespace}]} run`;
+    const execute = `execute if data storage imp:io ` + `{install: [${this.namespace}]} run`;
 
     const commands = [`function ${this.namespace}:${this.setupFunction}`];
 
