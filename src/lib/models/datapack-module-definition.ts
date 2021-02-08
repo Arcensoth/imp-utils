@@ -1,5 +1,11 @@
-import { DatapackModuleAuthor } from "./datapack-module-author";
-import { DatapackModuleDependencyMap } from "./datapack-module-dependency-map";
+export interface DatapackModuleAuthor {
+  name: string;
+  url?: string;
+}
+
+export interface DatapackModuleDependencyMap {
+  [id: string]: string;
+}
 
 export interface DatapackModuleDefinition {
   module_format: number;

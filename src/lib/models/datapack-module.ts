@@ -5,9 +5,11 @@ import {
   stringifyClickComponent,
   stringiyfyNbt,
 } from "../utils";
-import { DatapackModuleAuthor } from "./datapack-module-author";
-import { DatapackModuleDefinition } from "./datapack-module-definition";
-import { DatapackModuleDependencyMap } from "./datapack-module-dependency-map";
+import {
+  DatapackModuleAuthor,
+  DatapackModuleDefinition,
+  DatapackModuleDependencyMap,
+} from "./datapack-module-definition";
 import {
   RegistrantAuthor,
   RegistrantCommands,
@@ -122,7 +124,9 @@ export class DatapackModule {
       const data: RegistrantAuthor = {
         name: author.name,
         url: author.url,
-        click: author.url ? stringifyClickComponent("open_url", author.url) : undefined,
+        click: author.url
+          ? stringifyClickComponent("open_url", author.url)
+          : undefined,
       };
       if (!data.url) {
         delete data.url;
@@ -258,7 +262,8 @@ export class DatapackModule {
     const execute = `execute if data storage imp:io ` + `{register: true} run`;
 
     const commands = [
-      "data modify storage imp:io registrants append value " + stringiyfyNbt(this.registrantNbt),
+      "data modify storage imp:io registrants append value " +
+        stringiyfyNbt(this.registrantNbt),
     ];
 
     return commands.map((command) => {
@@ -267,7 +272,8 @@ export class DatapackModule {
   }
 
   public get installCommands(): string[] {
-    const execute = `execute if data storage imp:io ` + `{install: [${this.namespace}]} run`;
+    const execute =
+      `execute if data storage imp:io ` + `{install: [${this.namespace}]} run`;
 
     const commands = [`function ${this.namespace}:${this.setupFunction}`];
 

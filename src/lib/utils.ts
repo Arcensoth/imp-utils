@@ -1,6 +1,10 @@
 import { Range, SemVer } from "semver";
 import { SUPPORTED_COMPARATORS } from "./constants";
-import { VersionComparator, VersionComponents, VersionRange } from "./models/version";
+import {
+  VersionComparator,
+  VersionComponents,
+  VersionRange,
+} from "./models/version";
 
 export function stringifyClickComponent(action: string, value?: string): any {
   if (!value) {
@@ -15,7 +19,9 @@ export function stringifyClickComponent(action: string, value?: string): any {
   });
 }
 
-export function makeVersionComponents(versionString: string): VersionComponents {
+export function makeVersionComponents(
+  versionString: string
+): VersionComponents {
   const v = new SemVer(versionString);
   return {
     full: v.version,
@@ -55,9 +61,13 @@ export function makeVersionRanges(versionString: string): VersionRange[] {
           },
         });
       } else if (op) {
-        console.error(`Unsupported version comparator "${op}" in version: ${versionString}`);
+        console.error(
+          `Unsupported version comparator "${op}" in version: ${versionString}`
+        );
       } else {
-        console.warn(`Skipping empty version comparator in version: ${versionString}`);
+        console.warn(
+          `Skipping empty version comparator in version: ${versionString}`
+        );
       }
     }
 
