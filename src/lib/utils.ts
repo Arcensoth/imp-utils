@@ -36,20 +36,14 @@ export function makeVersionRanges(versionString: string): VersionRange[] {
 
   const r = new Range(versionString);
 
-  console.log("");
-
   const ccc = r.set;
 
   for (const cc of ccc) {
-    console.log(`  [${cc}]`);
-
     const comparators: VersionComparator[] = [];
 
     for (const c of cc) {
       const v = c.semver;
       const op = c.operator || (v instanceof SemVer ? "=" : "");
-
-      console.log(`    [${c}] (${op})`);
 
       if (SUPPORTED_COMPARATORS.includes(op)) {
         comparators.push({
@@ -75,8 +69,6 @@ export function makeVersionRanges(versionString: string): VersionRange[] {
       ranges.push({ comparators: comparators });
     }
   }
-
-  console.log("");
 
   return ranges;
 }
