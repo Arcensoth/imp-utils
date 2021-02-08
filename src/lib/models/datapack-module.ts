@@ -2,6 +2,7 @@ import { CHAT_LIMIT, TECHNICAL_ITEM } from "../constants";
 import {
   makeVersionComponents,
   makeVersionRanges,
+  removeUndefined,
   stringifyClickComponent,
   stringiyfyNbt,
 } from "../utils";
@@ -27,10 +28,10 @@ export class DatapackModule {
   public description: string;
   public version: string;
   public namespace: string;
-  public scorespace: string;
+  public scorespace?: string;
+  public url?: string;
   public authors: DatapackModuleAuthor[];
   public dependencies: DatapackModuleDependencyMap;
-  public url?: string;
   public manageFunction: string;
   public pauseFunction: string;
   public resumeFunction: string;
@@ -46,10 +47,10 @@ export class DatapackModule {
     description: string;
     version: string;
     namespace: string;
-    scorespace: string;
+    scorespace?: string;
+    url?: string;
     authors?: DatapackModuleAuthor[];
     dependencies?: DatapackModuleDependencyMap;
-    url?: string;
     manageFunction?: string;
     pauseFunction?: string;
     resumeFunction?: string;
@@ -65,9 +66,9 @@ export class DatapackModule {
     this.version = args.version;
     this.namespace = args.namespace;
     this.scorespace = args.scorespace;
+    this.url = args.url;
     this.authors = args.authors || [];
     this.dependencies = args.dependencies || {};
-    this.url = args.url;
     this.manageFunction = args.manageFunction || ".module/manage";
     this.pauseFunction = args.pauseFunction || ".module/pause";
     this.resumeFunction = args.resumeFunction || ".module/resume";
@@ -86,9 +87,9 @@ export class DatapackModule {
       version: obj.version,
       namespace: obj.namespace,
       scorespace: obj.scorespace,
+      url: obj.url,
       authors: obj.authors,
       dependencies: obj.dependencies,
-      url: obj.url,
       manageFunction: obj.manage_function,
       pauseFunction: obj.pause_function,
       resumeFunction: obj.resume_function,
@@ -238,7 +239,7 @@ export class DatapackModule {
   }
 
   public get registrantNbt(): RegistrantNbt {
-    const data: RegistrantNbt = {
+    return removeUndefined({
       module_format: this.moduleFormat,
       pack_format: this.packFormat,
       title: this.title,
@@ -251,11 +252,7 @@ export class DatapackModule {
       dependencies: this.registrantDependencies,
       commands: this.registrantCommands,
       components: this.registrantComponents,
-    };
-    if (!data.url) {
-      delete data.url;
-    }
-    return data;
+    });
   }
 
   public get registerCommands(): string[] {

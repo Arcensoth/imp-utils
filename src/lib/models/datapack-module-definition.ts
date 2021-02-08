@@ -15,7 +15,7 @@ export interface DatapackModuleDefinition {
   description: string;
   version: string;
   namespace: string;
-  scorespace: string;
+  scorespace?: string;
   url?: string;
   authors?: DatapackModuleAuthor[];
   dependencies?: DatapackModuleDependencyMap;

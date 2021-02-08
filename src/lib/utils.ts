@@ -73,6 +73,15 @@ export function makeVersionRanges(versionString: string): VersionRange[] {
   return ranges;
 }
 
+export function removeUndefined(obj: any): any {
+  for (const key in obj) {
+    if (obj[key] == undefined) {
+      delete obj[key];
+    }
+  }
+  return obj;
+}
+
 export function stringiyfyNbt(nbt: any): string {
   if (typeof nbt === "boolean") {
     return nbt ? "true" : "false";

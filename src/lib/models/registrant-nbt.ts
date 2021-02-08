@@ -37,7 +37,7 @@ export interface RegistrantNbt {
   description: string;
   version: VersionComponents;
   namespace: string;
-  scorespace: string;
+  scorespace?: string;
   url?: string;
   authors: RegistrantAuthor[];
   dependencies: RegistrantDependency[];
