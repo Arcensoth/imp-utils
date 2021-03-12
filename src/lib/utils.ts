@@ -2,7 +2,7 @@ import { Range, SemVer } from "semver";
 import { SUPPORTED_COMPARATORS } from "./constants";
 import {
   VersionComparator,
-  VersionComponents,
+  VersionParts,
   VersionRange,
 } from "./models/version";
 
@@ -19,9 +19,7 @@ export function stringifyClickComponent(action: string, value?: string): any {
   });
 }
 
-export function makeVersionComponents(
-  versionString: string
-): VersionComponents {
+export function makeVersionComponents(versionString: string): VersionParts {
   const v = new SemVer(versionString);
   return {
     full: v.version,
@@ -100,4 +98,8 @@ export function stringiyfyNbt(nbt: any): string {
     return "{" + pairs.join(", ") + "}";
   }
   throw Error(`Cannot stringify NBT: ${nbt}`);
+}
+
+export function formatJson(content: any): string {
+  return JSON.stringify(content, null, 2);
 }

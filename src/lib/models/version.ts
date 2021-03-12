@@ -11,7 +11,7 @@ export interface VersionRange {
   comparators: VersionComparator[];
 }
 
-export interface VersionComponents {
+export interface VersionParts {
   full: string;
   major: number;
   minor: number;

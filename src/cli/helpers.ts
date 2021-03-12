@@ -25,43 +25,35 @@ export function processDatapack(
   console.log("Processing datapack at:", datapackPath);
 
   const moduleJson: DatapackModuleDefinition = JSON.parse(
-    fs.readFileSync(path.join(datapackPath, ".module.json"), "utf8")
+    fs.readFileSync(path.join(datapackPath, "module.json"), "utf8")
   );
-
-  // assert compatible module format
-  if (moduleJson.module_format !== 2) {
-    console.error(
-      `Skipping incompatible module format ${moduleJson.module_format} for pack: ${datapackPath}`
-    );
-    return;
-  }
 
   const datapackModule = DatapackModule.fromObject(moduleJson);
 
-  // management function
-  const managementFunctionPath = path.join(
+  // register function
+  const registerFunctionPath = path.join(
     datapackPath,
     "data",
-    datapackModule.namespace,
+    datapackModule.name,
     "functions",
-    `${datapackModule.manageFunction}.mcfunction`
+    `${datapackModule.registerFunction}.mcfunction`
   );
-  console.log("Generating management function at:", managementFunctionPath);
-  const managementFunction = datapackModule.managementFunctionContents;
-  fs.writeFileSync(managementFunctionPath, managementFunction);
+  console.log("Generating register function at:", registerFunctionPath);
+  const registerFunction = datapackModule.registerFunctionContents;
+  fs.writeFileSync(registerFunctionPath, registerFunction);
 
-  // management tag
-  const managementTagPath = path.join(
+  // register tag
+  const registerTagPath = path.join(
     datapackPath,
     "data",
     "imp",
     "tags",
     "functions",
-    "manage.json"
+    "register.json"
   );
-  console.log("Generating management tag at:", managementTagPath);
-  const managementTag = datapackModule.managementTagContents;
-  fs.writeFileSync(managementTagPath, managementTag);
+  console.log("Generating register tag at:", registerTagPath);
+  const registerTag = datapackModule.registerTagContents;
+  fs.writeFileSync(registerTagPath, registerTag);
 
   // pack.mcmeta
   const packMcmetaPath = path.join(datapackPath, "pack.mcmeta");

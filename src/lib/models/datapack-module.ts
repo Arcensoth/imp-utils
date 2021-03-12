@@ -1,5 +1,6 @@
-import { CHAT_LIMIT, TECHNICAL_ITEM } from "../constants";
+import * as constants from "../constants";
 import {
+  formatJson,
   makeVersionComponents,
   makeVersionRanges,
   removeUndefined,
@@ -7,117 +8,125 @@ import {
   stringiyfyNbt,
 } from "../utils";
 import {
+  DatapackModuleAccessor,
   DatapackModuleAuthor,
   DatapackModuleDefinition,
   DatapackModuleDependencyMap,
+  TextComponent,
 } from "./datapack-module-definition";
 import {
+  RegistrantAccessor,
   RegistrantAuthor,
-  RegistrantCommands,
-  RegistrantComponents,
+  RegistrantBaseCommands,
+  RegistrantBaseComponents,
   RegistrantDependency,
   RegistrantNbt,
 } from "./registrant-nbt";
-import { VersionComponents } from "./version";
+import { VersionParts } from "./version";
 
 export class DatapackModule {
-  public moduleFormat: number;
-  public packFormat: number;
-  public title: string;
-  public styled_title: any;
-  public description: string;
+  public name: string;
   public version: string;
-  public namespace: string;
-  public scorespace?: string;
-  public url?: string;
+
+  public title?: TextComponent;
+  public description?: TextComponent;
+
+  public homepage?: string;
+  public bugs?: string;
+
+  public keywords: string[];
+
   public authors: DatapackModuleAuthor[];
+
   public dependencies: DatapackModuleDependencyMap;
-  public manageFunction: string;
+
+  public accessors: DatapackModuleAccessor[];
+
+  public filenames: string[];
+
+  public registerFunction: string;
+  public aboutFunction: string;
   public pauseFunction: string;
   public resumeFunction: string;
-  public setupFunction: string;
-  public teardownFunction: string;
-  public menuFunction: string;
+  public reinstallFunction: string;
+  public uninstallFunction: string;
+
+  public moduleFormat: number;
+  public packFormat: number;
+  public gameVersion: string;
 
   constructor(args: {
-    moduleFormat: number;
-    packFormat: number;
-    title: string;
-    styled_title: any;
-    description: string;
+    name: string;
     version: string;
-    namespace: string;
-    scorespace?: string;
-    url?: string;
+
+    title?: TextComponent;
+    description?: TextComponent;
+
+    homepage?: string;
+    bugs?: string;
+
+    keywords?: string[];
+
     authors?: DatapackModuleAuthor[];
+
     dependencies?: DatapackModuleDependencyMap;
-    manageFunction?: string;
+
+    accessors?: DatapackModuleAccessor[];
+
+    filenames?: string[];
+
+    registerFunction?: string;
+    aboutFunction?: string;
     pauseFunction?: string;
     resumeFunction?: string;
-    setupFunction?: string;
-    teardownFunction?: string;
-    menuFunction?: string;
+    reinstallFunction?: string;
+    uninstallFunction?: string;
+
+    moduleFormat?: number;
+    packFormat?: number;
+    gameVersion?: string;
   }) {
-    this.moduleFormat = args.moduleFormat;
-    this.packFormat = args.packFormat;
-    this.title = args.title;
-    this.styled_title = args.styled_title;
-    this.description = args.description;
+    this.name = args.name;
     this.version = args.version;
-    this.namespace = args.namespace;
-    this.scorespace = args.scorespace;
-    this.url = args.url;
+
+    this.title = args.title;
+    this.description = args.description;
+
+    this.homepage = args.homepage;
+    this.bugs = args.bugs;
+
+    this.keywords = args.keywords || [];
+
     this.authors = args.authors || [];
+
     this.dependencies = args.dependencies || {};
-    this.manageFunction = args.manageFunction || ".module/manage";
+
+    this.accessors = args.accessors || [];
+
+    this.filenames = args.filenames || [
+      this.name,
+      `${this.name}.zip`,
+      `${this.name}-${this.version}.zip`,
+    ];
+
+    this.registerFunction = args.registerFunction || ".module/register";
+    this.aboutFunction = args.aboutFunction || ".module/about";
     this.pauseFunction = args.pauseFunction || ".module/pause";
     this.resumeFunction = args.resumeFunction || ".module/resume";
-    this.setupFunction = args.setupFunction || ".module/setup";
-    this.teardownFunction = args.teardownFunction || ".module/teardown";
-    this.menuFunction = args.menuFunction || ".module/menu";
+    this.reinstallFunction = args.reinstallFunction || ".module/reinstall";
+    this.uninstallFunction = args.uninstallFunction || ".module/uninstall";
+
+    this.moduleFormat = args.moduleFormat || constants.DEFAULT_MODULE_FORMAT;
+    this.packFormat = args.packFormat || constants.DEFAULT_PACK_FORMAT;
+    this.gameVersion = args.gameVersion || constants.DEFAULT_GAME_VERSION;
   }
 
   public static fromObject(obj: DatapackModuleDefinition): DatapackModule {
-    const dp = new DatapackModule({
-      moduleFormat: obj.module_format,
-      packFormat: obj.pack_format,
-      title: obj.title,
-      styled_title: obj.styled_title,
-      description: obj.description,
-      version: obj.version,
-      namespace: obj.namespace,
-      scorespace: obj.scorespace,
-      url: obj.url,
-      authors: obj.authors,
-      dependencies: obj.dependencies,
-      manageFunction: obj.manage_function,
-      pauseFunction: obj.pause_function,
-      resumeFunction: obj.resume_function,
-      setupFunction: obj.setup_function,
-      teardownFunction: obj.teardown_function,
-      menuFunction: obj.menu_function,
-    });
-    return dp;
+    return new DatapackModule(obj);
   }
 
-  public toObject(): DatapackModuleDefinition {
-    return {
-      module_format: this.moduleFormat,
-      pack_format: this.packFormat,
-      title: this.title,
-      styled_title: this.styled_title,
-      description: this.description,
-      version: this.version,
-      namespace: this.namespace,
-      scorespace: this.scorespace,
-      url: this.url,
-      authors: this.authors,
-      dependencies: this.dependencies,
-      manage_function: this.manageFunction,
-      setup_function: this.setupFunction,
-      teardown_function: this.teardownFunction,
-      menu_function: this.menuFunction,
-    };
+  public get titleOrName(): string {
+    return this.title ? this.title : this.name;
   }
 
   public get registrantAuthors(): RegistrantAuthor[] {
@@ -125,13 +134,13 @@ export class DatapackModule {
       const data: RegistrantAuthor = {
         name: author.name,
         url: author.url,
-        click: author.url
+        click_component: author.url
           ? stringifyClickComponent("open_url", author.url)
           : undefined,
       };
       if (!data.url) {
         delete data.url;
-        delete data.click;
+        delete data.click_component;
       }
       return data;
     });
@@ -142,85 +151,91 @@ export class DatapackModule {
       const value = this.dependencies[key];
       const versionRanges = makeVersionRanges(value);
       return {
-        id: key,
+        name: key,
         version_ranges: versionRanges,
       };
     });
   }
 
-  public get pauseCommand(): string {
-    return `function ${this.namespace}:${this.pauseFunction}`;
+  public get registrantAccessors(): RegistrantAccessor[] {
+    return this.accessors.map((accessor) => {
+      return accessor;
+    });
   }
 
-  public get resumeCommand(): string {
-    return `function ${this.namespace}:${this.resumeFunction}`;
+  public get aboutFunctionCommand(): string {
+    return `function ${this.name}:${this.aboutFunction}`;
   }
 
-  public get setupCommand(): string {
-    return `function ${this.namespace}:${this.setupFunction}`;
+  public get pauseFunctionCommand(): string {
+    return `function ${this.name}:${this.pauseFunction}`;
   }
 
-  public get teardownCommand(): string {
-    return `function ${this.namespace}:${this.teardownFunction}`;
+  public get resumeFunctionCommand(): string {
+    return `function ${this.name}:${this.resumeFunction}`;
   }
 
-  public get enableCommands(): string[] {
-    return [
-      `datapack enable "file/${this.namespace}"`,
-      `datapack enable "file/${this.namespace}.zip"`,
-      `datapack enable "file/${this.namespace}-${this.version}.zip"`,
-    ];
+  public get reinstallFunctionCommand(): string {
+    return `function ${this.name}:${this.reinstallFunction}`;
   }
 
-  public get disableCommands(): string[] {
-    return [
-      `datapack disable "file/${this.namespace}"`,
-      `datapack disable "file/${this.namespace}.zip"`,
-      `datapack disable "file/${this.namespace}-${this.version}.zip"`,
-    ];
+  public get uninstallFunctionCommand(): string {
+    return `function ${this.name}:${this.uninstallFunction}`;
   }
 
-  public get registrantCommands(): RegistrantCommands {
+  public get enableDatapackCommands(): string[] {
+    return this.filenames.map(
+      (filename) => `datapack enable "file/${filename}"`
+    );
+  }
+
+  public get disableDatapackCommands(): string[] {
+    return this.filenames.map(
+      (filename) => `datapack disable "file/${filename}"`
+    );
+  }
+
+  public get registrantBaseCommands(): RegistrantBaseCommands {
     return {
-      pause: this.pauseCommand,
-      resume: this.resumeCommand,
-      setup: this.setupCommand,
-      teardown: this.teardownCommand,
-      enable: this.enableCommands,
-      disable: this.disableCommands,
+      pause_function: this.pauseFunctionCommand,
+      resume_function: this.resumeFunctionCommand,
+      reinstall_function: this.reinstallFunctionCommand,
+      uninstall_function: this.uninstallFunctionCommand,
+      enable_datapacks: this.enableDatapackCommands,
+      disable_datapacks: this.disableDatapackCommands,
     };
   }
 
-  public get registrantComponents(): RegistrantComponents {
-    return {
-      click_website: stringifyClickComponent("open_url", this.url),
-      action_menu: this.stringifiedActionComponent("menu"),
-      action_enable: this.stringifiedActionComponent("enable"),
-      action_forget: this.stringifiedActionComponent("forget"),
-      action_disable: this.stringifiedActionComponent("disable"),
-      action_uninstall: this.stringifiedActionComponent("uninstall"),
-      action_reinstall: this.stringifiedActionComponent("reinstall"),
+  public get registrantBaseComponents(): RegistrantBaseComponents {
+    const baseComponents: RegistrantBaseComponents = {
+      click_manage: this.stringifiedActionComponent("manage"),
+      click_enable: this.stringifiedActionComponent("enable"),
+      click_disable: this.stringifiedActionComponent("disable"),
+      click_reinstall: this.stringifiedActionComponent("reinstall"),
+      click_uninstall: this.stringifiedActionComponent("uninstall"),
+      click_forget: this.stringifiedActionComponent("forget"),
+      click_homepage: this.homepage
+        ? stringifyClickComponent("open_url", this.homepage)
+        : undefined,
+      click_bugs: this.bugs
+        ? stringifyClickComponent("open_url", this.bugs)
+        : undefined,
+      click_about: stringifyClickComponent(
+        "run_command",
+        `/${this.aboutFunctionCommand}`
+      ),
     };
+    return removeUndefined(baseComponents);
   }
 
   private actionCommand(action: string): string {
-    // const dispatchCommands = [
-    //   "data modify storage imp.__temp__:api/v0/manage __input__ " +
-    //     `set value {id:${this.namespace},action:${action}}`,
-    //   "function imp:api/v0/manage",
-    // ];
+    const technicalSnbt = `{__imp__: {manage: true, action: ${action}, name: ${this.name}}}`;
+    const buttonCommand = `/give @s ${constants.TECHNICAL_ITEM}${technicalSnbt}`;
 
-    // const stringifiedDispatchCommands = JSON.stringify(dispatchCommands);
-
-    // const buttonCommand = `/give @s ${TECHNICAL_ITEM}{imp:{d:1b,c:${stringifiedDispatchCommands}}}`;
-
-    const technicalSnbt = `{__imp__: {manage: true, action: ${action}, id: ${this.namespace}}}`;
-    const buttonCommand = `/give @s ${TECHNICAL_ITEM}${technicalSnbt}`;
-
-    if (buttonCommand.length > CHAT_LIMIT) {
+    if (buttonCommand.length > constants.CHAT_LIMIT) {
       console.error(
         `Command for ${action} button exceeds chat limit ` +
-          `(${buttonCommand.length} > ${CHAT_LIMIT}): ${buttonCommand}`
+          `(${buttonCommand.length} > ${constants.CHAT_LIMIT}): ${buttonCommand}`
       );
     }
 
@@ -234,90 +249,94 @@ export class DatapackModule {
     return escapedComponent;
   }
 
-  public get versionComponents(): VersionComponents {
+  public get versionComponents(): VersionParts {
     return makeVersionComponents(this.version);
   }
 
   public get registrantNbt(): RegistrantNbt {
-    return removeUndefined({
+    const registrantNbt: RegistrantNbt = {
+      name: this.name,
+      version: this.versionComponents,
+
+      title: this.title ? JSON.stringify(this.title) : undefined,
+      description: this.description
+        ? JSON.stringify(this.description)
+        : undefined,
+
+      homepage: this.homepage,
+      bugs: this.bugs,
+
+      keywords: this.keywords,
+
+      authors: this.registrantAuthors,
+
+      dependencies: this.registrantDependencies,
+
+      accessors: this.registrantAccessors,
+
+      base_commands: this.registrantBaseCommands,
+      base_components: this.registrantBaseComponents,
+
       module_format: this.moduleFormat,
       pack_format: this.packFormat,
-      title: this.title,
-      description: this.description,
-      version: this.versionComponents,
-      namespace: this.namespace,
-      scorespace: this.scorespace,
-      url: this.url,
-      authors: this.registrantAuthors,
-      dependencies: this.registrantDependencies,
-      commands: this.registrantCommands,
-      components: this.registrantComponents,
-    });
+      game_version: this.gameVersion,
+    };
+    return removeUndefined(registrantNbt);
   }
 
-  public get registerCommands(): string[] {
-    const execute = `execute if data storage imp:io ` + `{register: true} run`;
-
-    const commands = [
+  public get registerCommand(): string {
+    return (
       "data modify storage imp:io registrants append value " +
-        stringiyfyNbt(this.registrantNbt),
-    ];
-
-    return commands.map((command) => {
-      return `${execute} ${command}`;
-    });
-  }
-
-  public get installCommands(): string[] {
-    const execute =
-      `execute if data storage imp:io ` + `{install: [${this.namespace}]} run`;
-
-    const commands = [`function ${this.namespace}:${this.setupFunction}`];
-
-    return commands.map((command) => {
-      return `${execute} ${command}`;
-    });
+      stringiyfyNbt(this.registrantNbt)
+    );
   }
 
   public get packMcMetaContents(): string {
+    // base components to fit on pack selection menu
     const descriptionComponents = [
-      { text: "", color: "gray" },
-      this.styled_title,
-      "\\n",
-      this.description,
-      "\\n",
-      {
-        text: `Version ${this.version}`,
-        color: "dark_gray",
-      },
-      "\\n",
-      "By ",
+      { text: "", color: "dark_gray" },
+      this.titleOrName,
+      "\n",
+      { text: this.version, color: "gray" },
+      " for ",
+      { text: this.gameVersion, color: "gray" },
     ];
 
-    this.authors.forEach((author) => {
-      descriptionComponents.push({ text: author.name, color: "yellow" });
-      descriptionComponents.push(", ");
-    });
+    // add module authors, if any
+    if (this.authors.length > 0) {
+      descriptionComponents.push("\n");
+      descriptionComponents.push("By ");
+      this.authors.forEach((author) => {
+        descriptionComponents.push({ text: author.name, color: "yellow" });
+        descriptionComponents.push(", ");
+      });
+      descriptionComponents.pop();
+    }
 
-    descriptionComponents.pop();
+    // add module description, if any
+    if (this.description) {
+      descriptionComponents.push("\n");
+      descriptionComponents.push({ text: this.description, color: "gray" });
+    }
 
-    const data = {
+    const content = {
       pack: {
         pack_format: this.packFormat,
         description: descriptionComponents,
       },
     };
 
-    return JSON.stringify(data);
+    return formatJson(content);
   }
 
-  public get managementFunctionContents(): string {
-    return [...this.registerCommands, ...this.installCommands, ""].join("\n");
+  public get registerFunctionContents(): string {
+    return [this.registerCommand].join("\n");
   }
 
-  public get managementTagContents(): string {
-    return JSON.stringify({
-      values: [`${this.namespace}:${this.manageFunction}`],
-    });
+  public get registerTagContents(): string {
+    const content = {
+      values: [`${this.name}:${this.registerFunction}`],
+    };
+    return formatJson(content);
   }
 }
