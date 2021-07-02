@@ -38,8 +38,12 @@ export function processDatapack(
     "functions",
     `${datapackModule.registerFunction}.mcfunction`
   );
+  const registerFunctionDir = path.resolve(
+    path.join(registerFunctionPath, "..")
+  );
   console.log("Generating register function at:", registerFunctionPath);
   const registerFunction = datapackModule.registerFunctionContents;
+  fs.mkdirSync(registerFunctionDir, { recursive: true });
   fs.writeFileSync(registerFunctionPath, registerFunction);
 
   // register tag
@@ -51,8 +55,10 @@ export function processDatapack(
     "functions",
     "register.json"
   );
+  const registerTagDir = path.resolve(path.join(registerTagPath, ".."));
   console.log("Generating register tag at:", registerTagPath);
   const registerTag = datapackModule.registerTagContents;
+  fs.mkdirSync(registerTagDir, { recursive: true });
   fs.writeFileSync(registerTagPath, registerTag);
 
   // pack.mcmeta
